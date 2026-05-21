@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed-dim": "#95d3ba",
+                        "surface-container-highest": "#e2e3e0",
+                        "tertiary-fixed": "#ffdad7",
+                        "surface-dim": "#d9dad8",
+                        "on-tertiary-container": "#c28581",
+                        "on-secondary": "#ffffff",
+                        "inverse-primary": "#a0d1bc",
+                        "on-primary-container": "#709f8c",
+                        "on-surface": "#1a1c1b",
+                        "outline": "#717974",
+                        "on-primary-fixed": "#002117",
+                        "secondary": "#2b6954",
+                        "secondary-fixed": "#b0f0d6",
+                        "surface-container": "#edeeeb",
+                        "surface-bright": "#f9faf7",
+                        "primary-fixed-dim": "#a0d1bc",
+                        "on-error-container": "#93000a",
+                        "primary": "#001e15",
+                        "primary-container": "#003527",
+                        "primary-fixed": "#bcedd8",
+                        "on-secondary-fixed": "#002117",
+                        "on-secondary-container": "#306d58",
+                        "outline-variant": "#c0c8c3",
+                        "surface-container-high": "#e7e8e6",
+                        "error": "#ba1a1a",
+                        "surface-container-low": "#f3f4f1",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-tint": "#396756",
+                        "on-background": "#1a1c1b",
+                        "error-container": "#ffdad6",
+                        "surface": "#f9faf7",
+                        "on-secondary-fixed-variant": "#0b513d",
+                        "secondary-container": "#adedd3",
+                        "on-error": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "background": "#f9faf7",
+                        "on-tertiary-fixed-variant": "#693937",
+                        "tertiary": "#310d0c",
+                        "inverse-surface": "#2e312f",
+                        "tertiary-container": "#4b211f",
+                        "inverse-on-surface": "#f0f1ee",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-fixed": "#340f0e",
+                        "on-surface-variant": "#404944"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container_max_width": "1440px",
+                        "sidebar_width": "280px",
+                        "margin_mobile": "1rem",
+                        "gutter": "1.5rem",
+                        "margin_desktop": "2rem",
+                        "component_gap": "1rem"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Inter"],
+                        "data-tabular": ["Inter"],
+                        "headline-xl": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["13px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "data-tabular": ["14px", {"fontWeight": "500"}],
+                        "headline-xl": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-lg": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen">
+<main class="flex min-h-screen w-full">
+<!-- Left Section: Visual Narrative (Desktop Only) -->
+<section class="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-primary-container">
+<div class="absolute inset-0 z-0">
+<img alt="Modern retail store interior" class="w-full h-full object-cover opacity-60 mix-blend-overlay" data-alt="A sophisticated interior of a modern boutique retail store with minimalist wood shelving and clean architectural lines. The scene is bathed in a cinematic, deep botanical green gradient overlay that transitions from dark primary container shades to lighter translucent tones. High-end lighting highlights organized inventory displays, evoking a sense of corporate stability and efficient commercial management. The atmosphere is professional, tech-forward, and premium." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXEOf66Hbch9vg-psF66n0kyQUL-8b7snNmZjpXzr0Ih3zTFyaaCIkOmVuQUekPkCs7HbTKUx1O-msoBBhll9BYrPmPD0pUlG0jK2b9-3KhBXxLJ7gqzT-KZcAQ9w51XE1udg7aNcnB9Z2zidC65sBNR6QeRoc7DNHsd2GbTwO9VVPr-CNZxfrtF6aNIO9u1e49lwn7_glvtP7RHioDSPLwyU6JT8vfWB488ivK93s0mEcwUdhnuX69XpGwHaYGbPhddysnEb0zD8"/>
+</div>
+<!-- Content Overlay -->
+<div class="relative z-10 flex flex-col justify-between p-margin_desktop w-full text-on-primary">
+<!-- Brand Anchor -->
+<div class="flex items-center gap-3">
+<div class="bg-secondary rounded-lg p-2 flex items-center justify-center">
+<span class="material-symbols-outlined text-white" data-icon="inventory_2">inventory_2</span>
+</div>
+<span class="font-headline-lg text-headline-lg font-bold tracking-tight">StokPintar</span>
+</div>
+<!-- Messaging -->
+<div class="max-w-xl">
+<h1 class="font-headline-xl text-headline-xl mb-4 leading-tight">
+                        Efisiensi operasional di ujung jari Anda.
+                    </h1>
+<p class="font-body-md text-body-md text-on-primary/80 leading-relaxed text-lg">
+                        Kelola stok, pantau penjualan real-time, dan kembangkan bisnis UMKM Anda dengan presisi teknologi POS yang modern.
+                    </p>
+</div>
+<!-- Footer Visual Decoration -->
+<div class="flex gap-4 items-center">
+<div class="h-1 w-12 bg-secondary rounded-full"></div>
+<span class="font-label-sm text-label-sm uppercase tracking-widest opacity-60">MSME Edition</span>
+</div>
+</div>
+</section>
+<!-- Right Section: Login Form -->
+<section class="w-full lg:w-1/2 flex items-center justify-center bg-surface p-margin_mobile md:p-margin_desktop">
+<div class="w-full max-w-[420px] flex flex-col gap-8">
+<!-- Brand Anchor (Mobile Only) -->
+<div class="flex lg:hidden items-center gap-3 mb-4">
+<div class="bg-secondary rounded-lg p-2 flex items-center justify-center">
+<span class="material-symbols-outlined text-white" data-icon="inventory_2">inventory_2</span>
+</div>
+<span class="font-headline-lg text-headline-lg font-bold text-primary">StokPintar</span>
+</div>
+<!-- Header Text -->
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface font-bold">Selamat Datang Kembali</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-2">Masuk untuk mengelola stok dan transaksi toko Anda.</p>
+</div>
+<!-- Form -->
+<form class="flex flex-col gap-5">
+<!-- Email Field -->
+<div class="flex flex-col gap-2">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase" for="email">Email Bisnis</label>
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline" data-icon="mail">mail</span>
+<input class="w-full pl-11 pr-4 py-3 rounded-lg border border-outline-variant bg-surface-container-lowest focus:outline-none focus:border-secondary focus:ring-4 focus:ring-secondary-fixed transition-all font-body-md text-body-md" id="email" placeholder="nama@tokoanda.com" type="email"/>
+</div>
+</div>
+<!-- Password Field -->
+<div class="flex flex-col gap-2">
+<div class="flex justify-between items-center">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase" for="password">Kata Sandi</label>
+<a class="font-label-sm text-label-sm text-secondary-container bg-on-secondary-fixed-variant px-2 py-0.5 rounded hover:opacity-80 transition-opacity" href="#">Lupa Password?</a>
+</div>
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline" data-icon="lock">lock</span>
+<input class="w-full pl-11 pr-11 py-3 rounded-lg border border-outline-variant bg-surface-container-lowest focus:outline-none focus:border-secondary focus:ring-4 focus:ring-secondary-fixed transition-all font-body-md text-body-md" id="password" placeholder="••••••••" type="password"/>
+<button class="absolute right-3 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface transition-colors" type="button">
+<span class="material-symbols-outlined" data-icon="visibility">visibility</span>
+</button>
+</div>
+</div>
+<!-- Submit Button -->
+<button class="w-full bg-primary-container text-on-primary py-4 rounded-lg font-headline-lg text-body-md font-bold hover:bg-primary transition-all active:scale-[0.98] mt-4" type="submit">
+                        Masuk Sekarang
+                    </button>
+</form>
+<!-- Divider -->
+<div class="flex items-center gap-4">
+<div class="h-px bg-outline-variant flex-grow"></div>
+<span class="font-label-sm text-label-sm text-outline-variant uppercase">Atau</span>
+<div class="h-px bg-outline-variant flex-grow"></div>
+</div>
+<!-- Social Login -->
+<button class="w-full flex items-center justify-center gap-3 border border-outline-variant py-3.5 rounded-lg font-body-md text-body-md text-on-surface hover:bg-surface-container-low transition-all active:scale-[0.98]" type="button">
+<img alt="Google Logo" class="w-5 h-5" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD9ntOud0rW4ch47aVy_ftg6z_EwRVFlcGuL1hy4humdnv4CQk_-T5ZQnWKwg4K0PVrVc1WUHkpQbxVJ_snlbCOmGtlSiI-oOKMZbP6RbCOg_7MqCq94M2fwuZ-TowEA-6TbUAn3AhM76RPWeejU4W_0GKdI0GhnQKXVoFpxcjIStxqaKYbzYTuCtZNIbQHCd4hmtxRkOEqz33aO47nB6H9C15vpgTdz8PjgTxzR9KwIplxN-QwM3JSd82mZxaf-3DvUbP3Xit92f0"/>
+                    Masuk dengan Google
+                </button>
+<!-- Footer Links -->
+<div class="flex flex-col gap-6 items-center">
+<p class="font-body-md text-body-md text-on-surface-variant">
+                        Belum punya akun? <a class="text-secondary font-bold hover:underline" href="#">Daftar Sekarang</a>
+</p>
+<nav class="flex gap-4 text-outline font-label-sm text-[11px] uppercase tracking-wider">
+<a class="hover:text-on-surface-variant transition-colors" href="#">Privacy Policy</a>
+<span class="text-outline-variant">•</span>
+<a class="hover:text-on-surface-variant transition-colors" href="#">Terms of Service</a>
+<span class="text-outline-variant">•</span>
+<a class="hover:text-on-surface-variant transition-colors" href="#">Bantuan</a>
+</nav>
+</div>
+</div>
+</section>
+</main>
+</body></html>
