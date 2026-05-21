@@ -466,13 +466,13 @@
             background: var(--panel);
         }
         .auth-card { width: 100%; max-width: 420px; }
-        .auth-card header { margin-bottom: 32px; }
+        .auth-card header { margin-bottom: 28px; }
         .auth-card h1 { font-size: 24px; line-height: 32px; }
         .auth-brand-mobile { display: none; margin-bottom: 28px; }
         .google-login-button {
             width: 100%;
             min-height: 46px;
-            margin-bottom: 18px;
+            margin: 0;
             background: white;
             border-color: var(--line);
             color: var(--ink);
@@ -494,7 +494,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            margin: 0 0 18px;
+            margin: 22px 0;
             color: var(--muted);
             font-size: 12px;
             font-weight: 800;
@@ -551,7 +551,7 @@
             min-height: auto;
         }
         .auth-card footer {
-            margin-top: 36px;
+            margin-top: 28px;
             text-align: center;
             color: var(--muted);
         }
