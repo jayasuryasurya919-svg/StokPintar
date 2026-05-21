@@ -88,7 +88,7 @@
         <span class="badge">{{ $mutations->total() }} catatan</span>
     </div>
     <div class="table-wrap">
-        <table>
+        <table class="stock-history-table">
             <thead>
                 <tr>
                     <th>Waktu</th>
@@ -104,11 +104,11 @@
             <tbody>
                 @forelse($mutations as $m)
                     <tr>
-                        <td style="white-space:nowrap">{{ $m->created_at->format('d M Y H:i') }}</td>
+                        <td class="stock-time">{{ $m->created_at->format('d M Y H:i') }}</td>
                         <td>
-                            <strong>{{ $m->product?->name ?? '-' }}</strong>
+                            <strong class="stock-product-name">{{ $m->product?->name ?? '-' }}</strong>
                             @if($m->product?->sku)
-                                <div class="muted" style="font-size:12px">{{ $m->product->sku }}</div>
+                                <div class="muted stock-sku">{{ $m->product->sku }}</div>
                             @endif
                         </td>
                         <td>
@@ -130,13 +130,13 @@
                             @endphp
                             <span class="badge {{ $badgeClass }}">{{ $typeLabel }}</span>
                         </td>
-                        <td class="{{ $m->quantity < 0 ? '' : 'price' }}" style="font-weight:700">
+                        <td class="stock-number {{ $m->quantity < 0 ? 'stock-out' : 'price' }}">
                             {{ $m->quantity > 0 ? '+' : '' }}{{ $m->quantity }}
                         </td>
-                        <td>{{ $m->stock_before }}</td>
-                        <td><strong>{{ $m->stock_after }}</strong></td>
-                        <td>{{ $m->user?->name ?? 'Sistem' }}</td>
-                        <td class="muted">{{ $m->notes ?: '-' }}</td>
+                        <td class="stock-number">{{ $m->stock_before }}</td>
+                        <td class="stock-number"><strong>{{ $m->stock_after }}</strong></td>
+                        <td class="stock-user">{{ $m->user?->name ?? 'Sistem' }}</td>
+                        <td class="muted stock-note">{{ $m->notes ?: 'Tanpa catatan' }}</td>
                     </tr>
                 @empty
                     <tr><td colspan="8" class="empty-cell">Tidak ada data mutasi stok untuk filter ini.</td></tr>
@@ -147,4 +147,68 @@
     <div class="table-footer">{{ $mutations->links() }}</div>
 </section>
 </div>
+
+<style>
+    .stock-history-table {
+        table-layout: fixed;
+        min-width: 980px;
+    }
+
+    .stock-history-table th:nth-child(1),
+    .stock-history-table td:nth-child(1) { width: 160px; }
+
+    .stock-history-table th:nth-child(2),
+    .stock-history-table td:nth-child(2) { width: 240px; }
+
+    .stock-history-table th:nth-child(3),
+    .stock-history-table td:nth-child(3) { width: 120px; }
+
+    .stock-history-table th:nth-child(4),
+    .stock-history-table td:nth-child(4),
+    .stock-history-table th:nth-child(5),
+    .stock-history-table td:nth-child(5),
+    .stock-history-table th:nth-child(6),
+    .stock-history-table td:nth-child(6) {
+        width: 108px;
+        text-align: right;
+    }
+
+    .stock-history-table th:nth-child(7),
+    .stock-history-table td:nth-child(7) { width: 150px; }
+
+    .stock-history-table th:nth-child(8),
+    .stock-history-table td:nth-child(8) { width: 220px; }
+
+    .stock-time,
+    .stock-number {
+        white-space: nowrap;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .stock-number {
+        font-weight: 800;
+    }
+
+    .stock-out {
+        color: var(--rose);
+    }
+
+    .stock-product-name,
+    .stock-user,
+    .stock-note {
+        display: block;
+        overflow-wrap: anywhere;
+        line-height: 1.35;
+    }
+
+    .stock-sku {
+        margin-top: 3px;
+        font-size: 12px;
+        line-height: 1.25;
+    }
+
+    .stock-note {
+        color: var(--muted);
+    }
+</style>
 @endsection
