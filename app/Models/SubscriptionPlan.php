@@ -29,4 +29,9 @@ class SubscriptionPlan extends Model
     {
         return $this->hasMany(Tenant::class);
     }
+
+    public function hasFeature(string $feature): bool
+    {
+        return in_array($feature, $this->features ?? [], true);
+    }
 }

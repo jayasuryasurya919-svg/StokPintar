@@ -16,6 +16,7 @@ use App\Http\Controllers\StoreContextController;
 use App\Http\Controllers\StockMutationController;
 use App\Http\Controllers\StockHistoryController;
 use App\Http\Controllers\SubscriptionController;
+use App\Http\Controllers\SupportTicketController;
 use App\Http\Controllers\UserManagementController;
 use App\Models\Product;
 use App\Models\Sale;
@@ -91,6 +92,13 @@ Route::middleware('auth')->group(function () {
     Route::put('/platform/plans/{plan}', [PlatformAdminController::class, 'updatePlan'])
         ->middleware('permission:platform.manage')
         ->name('platform.plans.update');
+    Route::get('/support', [SupportTicketController::class, 'index'])->name('support.index');
+    Route::post('/support', [SupportTicketController::class, 'store'])
+        ->middleware('permission:subscription.manage')
+        ->name('support.store');
+    Route::put('/support/{ticket}', [SupportTicketController::class, 'update'])
+        ->middleware('permission:platform.manage')
+        ->name('support.update');
     Route::get('/dashboard', DashboardController::class)
         ->middleware('permission:dashboard.view')
         ->name('dashboard');

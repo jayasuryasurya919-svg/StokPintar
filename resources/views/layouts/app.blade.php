@@ -1355,6 +1355,9 @@
                 @if(auth()->user()->canPermission('subscription.manage'))
                     <a href="{{ route('subscription.index') }}" class="{{ request()->routeIs('subscription.*') ? 'active' : '' }}"><span class="material-symbols-outlined">workspace_premium</span> Paket & Setup</a>
                 @endif
+                @if(auth()->user()->canPermission('subscription.manage') || auth()->user()->canPermission('platform.manage'))
+                    <a href="{{ route('support.index') }}" class="{{ request()->routeIs('support.*') ? 'active' : '' }}"><span class="material-symbols-outlined">support_agent</span> Support</a>
+                @endif
                 @if(auth()->user()->canPermission('pos.access'))
                     <a href="{{ route('pos.index') }}" class="{{ request()->routeIs('pos.*') ? 'active' : '' }}"><span class="material-symbols-outlined">point_of_sale</span> POS Kasir</a>
                 @endif
