@@ -117,6 +117,113 @@ class SubscriptionManagementTest extends TestCase
         ]);
     }
 
+    public function test_fake_payment_provider_creates_pending_payment_and_redirects_to_simulation_page(): void
+    {
+        config(['services.payment.provider' => 'fake']);
+
+        $free = SubscriptionPlan::query()->create([
+            'code' => 'free',
+            'name' => 'Free',
+            'price' => 0,
+            'max_stores' => 1,
+            'max_products' => 50,
+            'max_users' => 2,
+            'report_retention_days' => 7,
+            'features' => ['basic_pos'],
+        ]);
+
+        $starter = SubscriptionPlan::query()->create([
+            'code' => 'starter',
+            'name' => 'Starter',
+            'price' => 49000,
+            'max_stores' => 1,
+            'max_products' => 500,
+            'max_users' => 5,
+            'report_retention_days' => 30,
+            'features' => ['basic_pos'],
+        ]);
+
+        [$owner, $tenant] = $this->ownerWithTenantAndPlan($free);
+
+        $response = $this->actingAs($owner)->post(route('subscription.plan.update'), [
+            'subscription_plan_id' => $starter->id,
+        ]);
+
+        $subscription = Subscription::withoutGlobalScopes()
+            ->where('tenant_id', $tenant->id)
+            ->where('subscription_plan_id', $starter->id)
+            ->where('provider', 'fake')
+            ->firstOrFail();
+
+        $response->assertRedirect(route('payments.fake.show', $subscription));
+
+        $tenant->refresh();
+
+        $this->assertSame($free->id, $tenant->subscription_plan_id);
+        $this->assertSame('pending', $subscription->status);
+        $this->assertSame(route('payments.fake.show', $subscription), $subscription->metadata['redirect_url']);
+    }
+
+    public function test_owner_can_complete_fake_payment_to_activate_paid_plan(): void
+    {
+        config(['services.payment.provider' => 'fake']);
+
+        $free = SubscriptionPlan::query()->create([
+            'code' => 'free',
+            'name' => 'Free',
+            'price' => 0,
+            'max_stores' => 1,
+            'max_products' => 50,
+            'max_users' => 2,
+            'report_retention_days' => 7,
+            'features' => ['basic_pos'],
+        ]);
+
+        $starter = SubscriptionPlan::query()->create([
+            'code' => 'starter',
+            'name' => 'Starter',
+            'price' => 49000,
+            'max_stores' => 1,
+            'max_products' => 500,
+            'max_users' => 5,
+            'report_retention_days' => 30,
+            'features' => ['basic_pos'],
+        ]);
+
+        [$owner, $tenant] = $this->ownerWithTenantAndPlan($free);
+
+        $subscription = Subscription::withoutGlobalScopes()->create([
+            'tenant_id' => $tenant->id,
+            'subscription_plan_id' => $starter->id,
+            'status' => 'pending',
+            'provider' => 'fake',
+            'provider_reference' => 'FAKE-SP-1-2-20260521150000',
+            'metadata' => ['amount' => 49000],
+        ]);
+
+        $this->actingAs($owner)
+            ->get(route('payments.fake.show', $subscription))
+            ->assertOk()
+            ->assertSee('Pembayaran Simulasi')
+            ->assertSee('Rp 49.000');
+
+        $this->actingAs($owner)
+            ->post(route('payments.fake.complete', $subscription))
+            ->assertRedirect(route('subscription.index'));
+
+        $tenant->refresh();
+
+        $this->assertSame($starter->id, $tenant->subscription_plan_id);
+        $this->assertSame('active', $tenant->status);
+        $this->assertDatabaseHas('subscriptions', [
+            'tenant_id' => $tenant->id,
+            'subscription_plan_id' => $starter->id,
+            'status' => 'active',
+            'provider' => 'fake',
+            'provider_reference' => 'FAKE-SP-1-2-20260521150000',
+        ]);
+    }
+
     public function test_midtrans_provider_creates_pending_payment_and_redirects_to_snap(): void
     {
         config([

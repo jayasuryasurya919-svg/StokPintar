@@ -41,6 +41,10 @@ class SubscriptionController extends Controller
 
         $plan = SubscriptionPlan::query()->findOrFail($data['subscription_plan_id']);
 
+        if ($this->shouldUseFakePayment($plan)) {
+            return $this->createFakePayment($request, $tenant, $plan);
+        }
+
         if ($this->shouldUseMidtrans($plan)) {
             return $this->createMidtransPayment($request, $tenant, $plan);
         }
@@ -182,6 +186,34 @@ class SubscriptionController extends Controller
         return response()->json(['status' => 'ok']);
     }
 
+    public function showFakePayment(Request $request, Subscription $subscription): View
+    {
+        $this->authorizeFakePayment($request, $subscription);
+
+        $subscription->load('plan');
+
+        return view('payments.fake', compact('subscription'));
+    }
+
+    public function completeFakePayment(Request $request, Subscription $subscription): RedirectResponse
+    {
+        $this->authorizeFakePayment($request, $subscription);
+
+        $tenant = $request->user()->tenant;
+        $plan = SubscriptionPlan::query()->findOrFail($subscription->subscription_plan_id);
+
+        abort_if(! $tenant, 404);
+
+        $this->activateSubscription($tenant, $plan, 'fake', $subscription->provider_reference, array_merge($subscription->metadata ?? [], [
+            'fake_paid_at' => now()->toISOString(),
+            'paid_via_fake_gateway' => true,
+        ]));
+
+        return redirect()
+            ->route('subscription.index')
+            ->with('status', "Pembayaran simulasi berhasil. Paket {$plan->name} sekarang aktif.");
+    }
+
     public function updateTenant(Request $request): RedirectResponse
     {
         $tenant = $request->user()->tenant;
@@ -227,6 +259,11 @@ class SubscriptionController extends Controller
         ], $payload);
     }
 
+    private function shouldUseFakePayment(SubscriptionPlan $plan): bool
+    {
+        return $plan->price > 0 && config('services.payment.provider') === 'fake';
+    }
+
     private function shouldUseMidtrans(SubscriptionPlan $plan): bool
     {
         $provider = config('services.payment.provider', 'auto');
@@ -243,6 +280,42 @@ class SubscriptionController extends Controller
         return $plan->price > 0
             && in_array($provider, ['auto', 'xendit'], true)
             && filled(config('services.payment.xendit.secret_key'));
+    }
+
+    private function createFakePayment(Request $request, Tenant $tenant, SubscriptionPlan $plan): RedirectResponse
+    {
+        $reference = 'FAKE-SP-'.$tenant->id.'-'.$plan->id.'-'.now()->format('YmdHis');
+        $amount = (int) $plan->price;
+
+        $subscription = Subscription::withoutGlobalScopes()->create([
+            'tenant_id' => $tenant->id,
+            'subscription_plan_id' => $plan->id,
+            'status' => 'pending',
+            'provider' => 'fake',
+            'provider_reference' => $reference,
+            'starts_at' => null,
+            'ends_at' => null,
+            'metadata' => [
+                'changed_by' => $request->user()->id,
+                'source' => 'owner-panel',
+                'amount' => $amount,
+                'reference' => $reference,
+            ],
+        ]);
+
+        $subscription->update([
+            'metadata' => array_merge($subscription->metadata ?? [], [
+                'redirect_url' => route('payments.fake.show', $subscription),
+            ]),
+        ]);
+
+        return redirect()->route('payments.fake.show', $subscription);
+    }
+
+    private function authorizeFakePayment(Request $request, Subscription $subscription): void
+    {
+        abort_unless($subscription->tenant_id === $request->user()->tenant_id, 403);
+        abort_unless($subscription->provider === 'fake' && $subscription->status === 'pending', 404);
     }
 
     private function createMidtransPayment(Request $request, Tenant $tenant, SubscriptionPlan $plan): RedirectResponse

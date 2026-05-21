@@ -118,6 +118,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/subscription/tenant', [SubscriptionController::class, 'updateTenant'])
         ->middleware('permission:subscription.manage')
         ->name('subscription.tenant.update');
+    Route::get('/payments/fake/{subscription}', [SubscriptionController::class, 'showFakePayment'])
+        ->middleware('permission:subscription.manage')
+        ->name('payments.fake.show');
+    Route::post('/payments/fake/{subscription}', [SubscriptionController::class, 'completeFakePayment'])
+        ->middleware('permission:subscription.manage')
+        ->name('payments.fake.complete');
     Route::get('/profil-bisnis', [BusinessProfileController::class, 'edit'])
         ->middleware('permission:subscription.manage')
         ->name('business-profile.edit');

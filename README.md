@@ -60,7 +60,7 @@ php artisan migrate:fresh --seed
 - Isi SMTP production agar undangan tim dan reset password benar-benar terkirim.
 - Jalankan queue worker untuk email dan pekerjaan background.
 - Isi storage/public disk sesuai hosting dan jalankan `php artisan storage:link`.
-- Biarkan `PAYMENT_PROVIDER=auto` agar aplikasi otomatis memakai gateway yang key-nya tersedia.
+- Pakai `PAYMENT_PROVIDER=fake` untuk demo lokal tanpa uang asli, lalu ganti ke `auto` saat production.
 - Isi key payment gateway hanya di `.env` server production, jangan commit key rahasia.
 - Pakai HTTPS agar akses kamera barcode browser bisa aktif di production.
 
@@ -68,6 +68,7 @@ php artisan migrate:fresh --seed
 
 Konfigurasi payment disiapkan oleh pemilik aplikasi/server di `.env`. Tenant atau owner toko tidak perlu menyentuh `.env`; mereka cukup klik tombol `Bayar` di halaman paket.
 
+- `PAYMENT_PROVIDER=fake`: pembayaran simulasi untuk demo; tombol bayar tetap ada, tapi tidak ada uang asli yang diproses.
 - `PAYMENT_PROVIDER=auto`: otomatis pakai Midtrans jika key Midtrans ada, kalau tidak pakai Xendit jika key Xendit ada.
 - `PAYMENT_PROVIDER=midtrans`: paksa hanya Midtrans.
 - `PAYMENT_PROVIDER=xendit`: paksa hanya Xendit.
