@@ -723,14 +723,19 @@
             min-width: 0;
         }
         .pos-segments {
+            flex: 0 1 auto;
             display: flex;
             gap: 4px;
+            max-width: min(100%, 620px);
+            overflow-x: auto;
             padding: 4px;
             border: 1px solid var(--line);
             border-radius: 8px;
             background: var(--surface-container);
+            scrollbar-width: thin;
         }
         .pos-segments button {
+            flex: 0 0 auto;
             border: 0;
             border-radius: 6px;
             background: transparent;
