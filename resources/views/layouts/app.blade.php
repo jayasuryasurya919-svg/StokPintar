@@ -220,6 +220,48 @@
             cursor: pointer;
         }
         .app-icon-button:hover { background: var(--surface-low); color: var(--ink); }
+        .settings-menu {
+            position: relative;
+        }
+        .settings-menu summary {
+            list-style: none;
+        }
+        .settings-menu summary::-webkit-details-marker {
+            display: none;
+        }
+        .settings-panel {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            z-index: 80;
+            min-width: 220px;
+            padding: 8px;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: var(--panel);
+            box-shadow: 0 18px 40px rgba(0, 30, 21, .16);
+            display: grid;
+            gap: 4px;
+        }
+        .settings-panel a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-height: 42px;
+            padding: 9px 10px;
+            border-radius: 8px;
+            color: var(--ink);
+            text-decoration: none;
+            font-weight: 800;
+        }
+        .settings-panel a:hover,
+        .settings-panel a.active {
+            background: var(--surface-low);
+            color: var(--green-container);
+        }
+        .settings-panel .material-symbols-outlined {
+            color: var(--muted);
+        }
         .app-avatar {
             width: 40px;
             height: 40px;
@@ -1308,9 +1350,6 @@
                 @if(auth()->user()->canPermission('subscription.manage'))
                     <a href="{{ route('subscription.index') }}" class="{{ request()->routeIs('subscription.*') ? 'active' : '' }}"><span class="material-symbols-outlined">workspace_premium</span> Paket & Setup</a>
                 @endif
-                @if(auth()->user()->canPermission('subscription.manage'))
-                    <a href="{{ route('business-profile.edit') }}" class="{{ request()->routeIs('business-profile.*') ? 'active' : '' }}"><span class="material-symbols-outlined">storefront</span> Profil Bisnis</a>
-                @endif
                 @if(auth()->user()->canPermission('pos.access'))
                     <a href="{{ route('pos.index') }}" class="{{ request()->routeIs('pos.*') ? 'active' : '' }}"><span class="material-symbols-outlined">point_of_sale</span> POS Kasir</a>
                 @endif
@@ -1361,16 +1400,30 @@
                     @if(auth()->user()->canPermission('products.manage') || auth()->user()->canPermission('pos.access'))
                         <div class="app-divider" aria-hidden="true"></div>
                     @endif
-                    @if(auth()->user()->canPermission('subscription.manage'))
-                        <a class="app-icon-button" href="{{ route('business-profile.edit') }}" aria-label="Pengaturan bisnis">
+                    <details class="settings-menu" data-settings-menu>
+                        <summary class="app-icon-button" aria-label="Pengaturan">
                             <span class="material-symbols-outlined">settings</span>
-                        </a>
-                    @elseif(auth()->user()->canPermission('users.manage'))
-                        <a class="app-icon-button" href="{{ route('users.index') }}" aria-label="Pengaturan tim">
-                            <span class="material-symbols-outlined">settings</span>
-                        </a>
-                    @endif
-                    <a class="app-avatar" href="{{ route('account.edit') }}" aria-label="Akun Saya - {{ auth()->user()->name }}">
+                        </summary>
+                        <div class="settings-panel">
+                            @if(auth()->user()->canPermission('subscription.manage'))
+                                <a href="{{ route('business-profile.edit') }}" class="{{ request()->routeIs('business-profile.*') ? 'active' : '' }}">
+                                    <span class="material-symbols-outlined">storefront</span>
+                                    Pengaturan Bisnis
+                                </a>
+                            @endif
+                            <a href="{{ route('account.edit') }}" class="{{ request()->routeIs('account.*') ? 'active' : '' }}">
+                                <span class="material-symbols-outlined">account_circle</span>
+                                Pengaturan Akun
+                            </a>
+                            @if(auth()->user()->canPermission('users.manage'))
+                                <a href="{{ route('users.index') }}" class="{{ request()->routeIs('users.*') ? 'active' : '' }}">
+                                    <span class="material-symbols-outlined">groups</span>
+                                    Pengaturan Tim
+                                </a>
+                            @endif
+                        </div>
+                    </details>
+                    <a class="app-avatar" href="{{ route('account.edit') }}" aria-label="{{ auth()->user()->name }}">
                         {{ strtoupper(mb_substr(auth()->user()->name, 0, 1)) }}
                     </a>
                 </div>
@@ -1423,6 +1476,14 @@
                 mobileBtn.addEventListener('click', toggleMenu);
                 overlay.addEventListener('click', toggleMenu);
             }
+
+            document.addEventListener('click', event => {
+                document.querySelectorAll('[data-settings-menu][open]').forEach(menu => {
+                    if (!menu.contains(event.target)) {
+                        menu.removeAttribute('open');
+                    }
+                });
+            });
 
             // Toast Notification System
             window.showToast = function(message, type = 'success') {
