@@ -33,8 +33,62 @@ class SubscriptionManagementTest extends TestCase
             ->assertSee('Pilih Paket');
     }
 
-    public function test_owner_can_switch_subscription_plan_and_subscription_record_is_created(): void
+    public function test_owner_can_switch_to_free_plan_without_payment_gateway(): void
     {
+        $free = SubscriptionPlan::query()->create([
+            'code' => 'free',
+            'name' => 'Free',
+            'price' => 0,
+            'max_stores' => 1,
+            'max_products' => 50,
+            'max_users' => 2,
+            'report_retention_days' => 7,
+            'features' => ['basic_pos'],
+        ]);
+
+        $paidPlan = SubscriptionPlan::query()->create([
+            'code' => 'pro',
+            'name' => 'Pro',
+            'price' => 99000,
+            'max_stores' => 5,
+            'max_products' => null,
+            'max_users' => null,
+            'report_retention_days' => null,
+            'features' => ['basic_pos', 'priority_support'],
+        ]);
+
+        [$owner, $tenant] = $this->ownerWithTenantAndPlan($paidPlan);
+
+        $this->actingAs($owner)->post(route('subscription.plan.update'), [
+            'subscription_plan_id' => $free->id,
+        ])->assertRedirect(route('subscription.index'));
+
+        $tenant->refresh();
+
+        $this->assertSame($free->id, $tenant->subscription_plan_id);
+        $this->assertDatabaseHas('subscriptions', [
+            'tenant_id' => $tenant->id,
+            'subscription_plan_id' => $free->id,
+            'status' => 'active',
+            'provider' => 'manual',
+        ]);
+    }
+
+    public function test_owner_cannot_upgrade_to_paid_plan_without_payment_gateway(): void
+    {
+        config(['services.payment.provider' => 'manual']);
+
+        $free = SubscriptionPlan::query()->create([
+            'code' => 'free',
+            'name' => 'Free',
+            'price' => 0,
+            'max_stores' => 1,
+            'max_products' => 50,
+            'max_users' => 2,
+            'report_retention_days' => 7,
+            'features' => ['basic_pos'],
+        ]);
+
         $starter = SubscriptionPlan::query()->create([
             'code' => 'starter',
             'name' => 'Starter',
@@ -46,29 +100,18 @@ class SubscriptionManagementTest extends TestCase
             'features' => ['basic_pos'],
         ]);
 
-        $pro = SubscriptionPlan::query()->create([
-            'code' => 'pro',
-            'name' => 'Pro',
-            'price' => 99000,
-            'max_stores' => 5,
-            'max_products' => null,
-            'max_users' => null,
-            'report_retention_days' => null,
-            'features' => ['basic_pos', 'priority_support'],
-        ]);
-
-        [$owner, $tenant] = $this->ownerWithTenantAndPlan($starter);
+        [$owner, $tenant] = $this->ownerWithTenantAndPlan($free);
 
         $this->actingAs($owner)->post(route('subscription.plan.update'), [
-            'subscription_plan_id' => $pro->id,
-        ])->assertRedirect(route('subscription.index'));
+            'subscription_plan_id' => $starter->id,
+        ])->assertSessionHasErrors('subscription_plan_id');
 
         $tenant->refresh();
 
-        $this->assertSame($pro->id, $tenant->subscription_plan_id);
-        $this->assertDatabaseHas('subscriptions', [
+        $this->assertSame($free->id, $tenant->subscription_plan_id);
+        $this->assertDatabaseMissing('subscriptions', [
             'tenant_id' => $tenant->id,
-            'subscription_plan_id' => $pro->id,
+            'subscription_plan_id' => $starter->id,
             'status' => 'active',
             'provider' => 'manual',
         ]);

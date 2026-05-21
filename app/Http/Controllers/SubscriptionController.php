@@ -49,6 +49,12 @@ class SubscriptionController extends Controller
             return $this->createXenditPayment($request, $tenant, $plan);
         }
 
+        if ($plan->price > 0) {
+            return back()->withErrors([
+                'subscription_plan_id' => 'Payment gateway belum aktif. Pilih Midtrans/Xendit di .env sebelum upgrade ke paket berbayar.',
+            ]);
+        }
+
         $this->activateSubscription($tenant, $plan, 'manual', null, [
             'changed_by' => $request->user()->id,
             'source' => 'owner-panel',

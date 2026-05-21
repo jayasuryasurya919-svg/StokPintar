@@ -110,7 +110,7 @@
                                         <form method="POST" action="{{ route('subscription.plan.update') }}">
                                             @csrf
                                             <input type="hidden" name="subscription_plan_id" value="{{ $plan->id }}">
-                                            <button class="btn small primary" type="submit">Pilih</button>
+                                            <button class="btn small primary" type="submit">{{ $plan->price > 0 ? 'Bayar' : 'Pilih' }}</button>
                                         </form>
                                     @endif
                                 </td>
