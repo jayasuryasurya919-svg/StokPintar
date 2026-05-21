@@ -50,6 +50,21 @@
                 <h2>{{ $isPlatformAdmin ? 'Semua Tiket Support' : 'Tiket Saya' }}</h2>
                 <span class="badge">{{ $tickets->total() }} tiket</span>
             </div>
+            <div class="support-tabs">
+                @foreach([
+                    'active' => 'Aktif',
+                    'priority' => 'Priority',
+                    'open' => 'Open',
+                    'in_progress' => 'Diproses',
+                    'resolved' => 'Selesai',
+                    'all' => 'Semua',
+                ] as $key => $label)
+                    <a href="{{ route('support.index', ['filter' => $key]) }}" class="{{ $filter === $key ? 'active' : '' }}">
+                        <span>{{ $label }}</span>
+                        <strong>{{ $ticketCounts[$key] ?? 0 }}</strong>
+                    </a>
+                @endforeach
+            </div>
             <div class="table-wrap">
                 <table>
                     <thead>
@@ -88,7 +103,7 @@
                                 </td>
                                 <td>
                                     <span class="badge {{ $ticket->status === 'resolved' ? 'ok' : ($ticket->status === 'open' ? 'money' : '') }}">
-                                        {{ str_replace('_', ' ', ucfirst($ticket->status)) }}
+                                        {{ ['open' => 'Open', 'in_progress' => 'Diproses', 'resolved' => 'Selesai'][$ticket->status] ?? $ticket->status }}
                                     </span>
                                 </td>
                                 <td>{{ $ticket->created_at->format('d M Y H:i') }}</td>
@@ -131,4 +146,44 @@
             </div>
         </section>
     </div>
+
+    <style>
+        .support-tabs {
+            display: flex;
+            gap: 8px;
+            padding: 14px 24px;
+            border-bottom: 1px solid var(--line);
+            overflow-x: auto;
+        }
+        .support-tabs a {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            flex: 0 0 auto;
+            min-height: 36px;
+            padding: 8px 12px;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            color: var(--muted);
+            font-weight: 800;
+            text-decoration: none;
+        }
+        .support-tabs a.active {
+            background: var(--green-container);
+            border-color: var(--green-container);
+            color: white;
+        }
+        .support-tabs strong {
+            min-width: 24px;
+            padding: 2px 7px;
+            border-radius: 999px;
+            background: var(--surface-container);
+            color: var(--green-container);
+            font-size: 12px;
+            text-align: center;
+        }
+        .support-tabs a.active strong {
+            background: var(--green-soft);
+        }
+    </style>
 @endsection

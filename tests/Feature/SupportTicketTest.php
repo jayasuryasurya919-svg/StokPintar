@@ -86,6 +86,36 @@ class SupportTicketTest extends TestCase
         $this->assertNotNull($ticket->resolved_at);
     }
 
+    public function test_support_page_filters_priority_tickets(): void
+    {
+        [$owner, $tenant] = $this->tenantOwner(['priority_support']);
+
+        SupportTicket::withoutGlobalScopes()->create([
+            'tenant_id' => $tenant->id,
+            'user_id' => $owner->id,
+            'priority' => 'priority',
+            'status' => 'open',
+            'subject' => 'Tiket prioritas',
+            'message' => 'Butuh bantuan cepat.',
+        ]);
+
+        SupportTicket::withoutGlobalScopes()->create([
+            'tenant_id' => $tenant->id,
+            'user_id' => $owner->id,
+            'priority' => 'normal',
+            'status' => 'open',
+            'subject' => 'Tiket regular',
+            'message' => 'Bantuan biasa.',
+        ]);
+
+        $this->actingAs($owner)
+            ->get(route('support.index', ['filter' => 'priority']))
+            ->assertOk()
+            ->assertSee('Tiket prioritas')
+            ->assertDontSee('Tiket regular')
+            ->assertSee('Priority');
+    }
+
     public function test_cashier_cannot_access_support_area(): void
     {
         [, $tenant] = $this->tenantOwner(['priority_support']);

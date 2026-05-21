@@ -17,17 +17,35 @@ class SupportTicketController extends Controller
 
         abort_unless($isPlatformAdmin || $user->canPermission('subscription.manage'), 403);
 
-        $query = SupportTicket::withoutGlobalScopes()
+        $filter = $request->query('filter', 'active');
+        $allowedFilters = ['active', 'priority', 'open', 'in_progress', 'resolved', 'all'];
+        $filter = in_array($filter, $allowedFilters, true) ? $filter : 'active';
+
+        $baseQuery = SupportTicket::withoutGlobalScopes()
+            ->when(! $isPlatformAdmin, fn ($query) => $query->where('tenant_id', $user->tenant_id));
+
+        $ticketCounts = [
+            'active' => (clone $baseQuery)->whereIn('status', [SupportTicket::STATUS_OPEN, SupportTicket::STATUS_IN_PROGRESS])->count(),
+            'priority' => (clone $baseQuery)->where('priority', SupportTicket::PRIORITY_PRIORITY)->where('status', '!=', SupportTicket::STATUS_RESOLVED)->count(),
+            'open' => (clone $baseQuery)->where('status', SupportTicket::STATUS_OPEN)->count(),
+            'in_progress' => (clone $baseQuery)->where('status', SupportTicket::STATUS_IN_PROGRESS)->count(),
+            'resolved' => (clone $baseQuery)->where('status', SupportTicket::STATUS_RESOLVED)->count(),
+            'all' => (clone $baseQuery)->count(),
+        ];
+
+        $query = (clone $baseQuery)
             ->with(['tenant.subscriptionPlan', 'requester'])
-            ->when(! $isPlatformAdmin, fn ($query) => $query->where('tenant_id', $user->tenant_id))
+            ->when($filter === 'active', fn ($query) => $query->whereIn('status', [SupportTicket::STATUS_OPEN, SupportTicket::STATUS_IN_PROGRESS]))
+            ->when($filter === 'priority', fn ($query) => $query->where('priority', SupportTicket::PRIORITY_PRIORITY)->where('status', '!=', SupportTicket::STATUS_RESOLVED))
+            ->when(in_array($filter, ['open', 'in_progress', 'resolved'], true), fn ($query) => $query->where('status', $filter))
             ->orderByRaw("case when priority = 'priority' and status != 'resolved' then 0 else 1 end")
             ->latest();
 
-        $tickets = $query->paginate(10);
+        $tickets = $query->paginate(10)->withQueryString();
         $tenant = $user->tenant?->load('subscriptionPlan');
         $hasPrioritySupport = (bool) $tenant?->subscriptionPlan?->hasFeature('priority_support');
 
-        return view('support.index', compact('tickets', 'isPlatformAdmin', 'tenant', 'hasPrioritySupport'));
+        return view('support.index', compact('tickets', 'isPlatformAdmin', 'tenant', 'hasPrioritySupport', 'ticketCounts', 'filter'));
     }
 
     public function store(Request $request): RedirectResponse

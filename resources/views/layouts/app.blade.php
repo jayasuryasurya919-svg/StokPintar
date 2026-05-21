@@ -135,6 +135,17 @@
             color: white;
         }
         .nav a.active { border-right-color: var(--green-mint); font-weight: 800; background: rgba(255,255,255,.12); }
+        .nav-count {
+            margin-left: auto;
+            min-width: 24px;
+            padding: 2px 7px;
+            border-radius: 999px;
+            background: var(--green-mint);
+            color: var(--green-container);
+            font-size: 12px;
+            line-height: 18px;
+            text-align: center;
+        }
 
         .role-box {
             margin-top: auto;
@@ -1356,7 +1367,19 @@
                     <a href="{{ route('subscription.index') }}" class="{{ request()->routeIs('subscription.*') ? 'active' : '' }}"><span class="material-symbols-outlined">workspace_premium</span> Paket & Setup</a>
                 @endif
                 @if(auth()->user()->canPermission('subscription.manage') || auth()->user()->canPermission('platform.manage'))
-                    <a href="{{ route('support.index') }}" class="{{ request()->routeIs('support.*') ? 'active' : '' }}"><span class="material-symbols-outlined">support_agent</span> Support</a>
+                    @php
+                        $supportBadgeCount = \App\Models\SupportTicket::withoutGlobalScopes()
+                            ->when(! auth()->user()->canPermission('platform.manage'), fn ($query) => $query->where('tenant_id', auth()->user()->tenant_id))
+                            ->whereIn('status', ['open', 'in_progress'])
+                            ->count();
+                    @endphp
+                    <a href="{{ route('support.index') }}" class="{{ request()->routeIs('support.*') ? 'active' : '' }}">
+                        <span class="material-symbols-outlined">support_agent</span>
+                        Support
+                        @if($supportBadgeCount > 0)
+                            <strong class="nav-count">{{ $supportBadgeCount > 99 ? '99+' : $supportBadgeCount }}</strong>
+                        @endif
+                    </a>
                 @endif
                 @if(auth()->user()->canPermission('pos.access'))
                     <a href="{{ route('pos.index') }}" class="{{ request()->routeIs('pos.*') ? 'active' : '' }}"><span class="material-symbols-outlined">point_of_sale</span> POS Kasir</a>
