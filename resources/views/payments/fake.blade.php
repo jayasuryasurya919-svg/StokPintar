@@ -29,7 +29,10 @@
                 <div class="soft-panel">
                     <p class="metric-label">Status</p>
                     <p class="metric-value">Pending</p>
-                    <p class="metric-note">Klik bayar untuk mengaktifkan paket</p>
+                    <p class="metric-note">
+                        Berlaku sampai
+                        {{ isset($subscription->metadata['expires_at']) ? \Illuminate\Support\Carbon::parse($subscription->metadata['expires_at'])->timezone(config('app.timezone'))->format('d M Y H:i') : '-' }}
+                    </p>
                 </div>
             </div>
 
@@ -38,11 +41,17 @@
                 <p>Halaman ini menggantikan Midtrans/Xendit selama demo. Nanti ketika gateway asli sudah siap, cukup ganti provider pembayaran di server.</p>
             </div>
 
-            <form method="POST" action="{{ route('payments.fake.complete', $subscription) }}" class="action-row" style="justify-content:flex-end;">
-                @csrf
+            <div class="action-row" style="justify-content:flex-end;">
                 <a class="btn" href="{{ route('subscription.index') }}">Kembali</a>
-                <button class="btn primary" type="submit">Bayar Simulasi</button>
-            </form>
+                <form method="POST" action="{{ route('payments.fake.cancel', $subscription) }}">
+                    @csrf
+                    <button class="btn" type="submit">Batalkan</button>
+                </form>
+                <form method="POST" action="{{ route('payments.fake.complete', $subscription) }}">
+                    @csrf
+                    <button class="btn primary" type="submit">Bayar Simulasi</button>
+                </form>
+            </div>
         </section>
     </div>
 @endsection

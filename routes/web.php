@@ -124,6 +124,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/payments/fake/{subscription}', [SubscriptionController::class, 'completeFakePayment'])
         ->middleware('permission:subscription.manage')
         ->name('payments.fake.complete');
+    Route::post('/payments/fake/{subscription}/cancel', [SubscriptionController::class, 'cancelFakePayment'])
+        ->middleware('permission:subscription.manage')
+        ->name('payments.fake.cancel');
     Route::get('/profil-bisnis', [BusinessProfileController::class, 'edit'])
         ->middleware('permission:subscription.manage')
         ->name('business-profile.edit');

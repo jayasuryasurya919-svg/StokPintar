@@ -68,7 +68,7 @@ php artisan migrate:fresh --seed
 
 Konfigurasi payment disiapkan oleh pemilik aplikasi/server di `.env`. Tenant atau owner toko tidak perlu menyentuh `.env`; mereka cukup klik tombol `Bayar` di halaman paket.
 
-- `PAYMENT_PROVIDER=fake`: pembayaran simulasi untuk demo; tombol bayar tetap ada, tapi tidak ada uang asli yang diproses.
+- `PAYMENT_PROVIDER=fake`: pembayaran simulasi untuk demo; tombol bayar tetap ada, transaksi bisa dibayar/dibatalkan, dan tidak ada uang asli yang diproses.
 - `PAYMENT_PROVIDER=auto`: otomatis pakai Midtrans jika key Midtrans ada, kalau tidak pakai Xendit jika key Xendit ada.
 - `PAYMENT_PROVIDER=midtrans`: paksa hanya Midtrans.
 - `PAYMENT_PROVIDER=xendit`: paksa hanya Xendit.
@@ -87,6 +87,8 @@ https://domain-anda.example/payments/xendit/callback
 ```
 
 Di lokal, gunakan tunnel seperti Ngrok agar Midtrans/Xendit bisa mengirim webhook ke komputer pengembangan.
+
+Untuk production, jangan gunakan `fake` kecuali memang sedang membuka sandbox/demo publik. Mode production yang disarankan adalah `auto` dengan salah satu gateway asli terisi.
 
 ## Barcode Scanner
 

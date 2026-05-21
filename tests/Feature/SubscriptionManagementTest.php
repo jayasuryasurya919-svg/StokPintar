@@ -224,6 +224,111 @@ class SubscriptionManagementTest extends TestCase
         ]);
     }
 
+    public function test_owner_can_cancel_pending_fake_payment_without_changing_plan(): void
+    {
+        config(['services.payment.provider' => 'fake']);
+
+        $free = SubscriptionPlan::query()->create([
+            'code' => 'free',
+            'name' => 'Free',
+            'price' => 0,
+            'max_stores' => 1,
+            'max_products' => 50,
+            'max_users' => 2,
+            'report_retention_days' => 7,
+            'features' => ['basic_pos'],
+        ]);
+
+        $starter = SubscriptionPlan::query()->create([
+            'code' => 'starter',
+            'name' => 'Starter',
+            'price' => 49000,
+            'max_stores' => 1,
+            'max_products' => 500,
+            'max_users' => 5,
+            'report_retention_days' => 30,
+            'features' => ['basic_pos'],
+        ]);
+
+        [$owner, $tenant] = $this->ownerWithTenantAndPlan($free);
+
+        $subscription = Subscription::withoutGlobalScopes()->create([
+            'tenant_id' => $tenant->id,
+            'subscription_plan_id' => $starter->id,
+            'status' => 'pending',
+            'provider' => 'fake',
+            'provider_reference' => 'FAKE-SP-CANCEL',
+            'metadata' => [
+                'amount' => 49000,
+                'expires_at' => now()->addDay()->toISOString(),
+            ],
+        ]);
+
+        $this->actingAs($owner)
+            ->post(route('payments.fake.cancel', $subscription))
+            ->assertRedirect(route('subscription.index'));
+
+        $tenant->refresh();
+        $subscription->refresh();
+
+        $this->assertSame($free->id, $tenant->subscription_plan_id);
+        $this->assertSame('failed', $subscription->status);
+        $this->assertArrayHasKey('fake_cancelled_at', $subscription->metadata);
+    }
+
+    public function test_expired_fake_payment_cannot_activate_paid_plan(): void
+    {
+        config(['services.payment.provider' => 'fake']);
+
+        $free = SubscriptionPlan::query()->create([
+            'code' => 'free',
+            'name' => 'Free',
+            'price' => 0,
+            'max_stores' => 1,
+            'max_products' => 50,
+            'max_users' => 2,
+            'report_retention_days' => 7,
+            'features' => ['basic_pos'],
+        ]);
+
+        $starter = SubscriptionPlan::query()->create([
+            'code' => 'starter',
+            'name' => 'Starter',
+            'price' => 49000,
+            'max_stores' => 1,
+            'max_products' => 500,
+            'max_users' => 5,
+            'report_retention_days' => 30,
+            'features' => ['basic_pos'],
+        ]);
+
+        [$owner, $tenant] = $this->ownerWithTenantAndPlan($free);
+
+        $subscription = Subscription::withoutGlobalScopes()->create([
+            'tenant_id' => $tenant->id,
+            'subscription_plan_id' => $starter->id,
+            'status' => 'pending',
+            'provider' => 'fake',
+            'provider_reference' => 'FAKE-SP-EXPIRED',
+            'metadata' => [
+                'amount' => 49000,
+                'expires_at' => now()->subMinute()->toISOString(),
+            ],
+        ]);
+
+        $this->actingAs($owner)
+            ->post(route('payments.fake.complete', $subscription))
+            ->assertRedirect(route('subscription.index'))
+            ->assertSessionHasErrors('subscription');
+
+        $tenant->refresh();
+        $subscription->refresh();
+
+        $this->assertSame($free->id, $tenant->subscription_plan_id);
+        $this->assertSame('failed', $subscription->status);
+        $this->assertArrayHasKey('fake_expired_at', $subscription->metadata);
+    }
+
     public function test_midtrans_provider_creates_pending_payment_and_redirects_to_snap(): void
     {
         config([

@@ -186,9 +186,15 @@ class SubscriptionController extends Controller
         return response()->json(['status' => 'ok']);
     }
 
-    public function showFakePayment(Request $request, Subscription $subscription): View
+    public function showFakePayment(Request $request, Subscription $subscription): View|RedirectResponse
     {
         $this->authorizeFakePayment($request, $subscription);
+
+        if ($this->expireFakePaymentIfNeeded($subscription)) {
+            return redirect()
+                ->route('subscription.index')
+                ->withErrors(['subscription' => 'Pembayaran simulasi sudah kedaluwarsa. Silakan pilih paket lagi.']);
+        }
 
         $subscription->load('plan');
 
@@ -198,6 +204,12 @@ class SubscriptionController extends Controller
     public function completeFakePayment(Request $request, Subscription $subscription): RedirectResponse
     {
         $this->authorizeFakePayment($request, $subscription);
+
+        if ($this->expireFakePaymentIfNeeded($subscription)) {
+            return redirect()
+                ->route('subscription.index')
+                ->withErrors(['subscription' => 'Pembayaran simulasi sudah kedaluwarsa. Silakan pilih paket lagi.']);
+        }
 
         $tenant = $request->user()->tenant;
         $plan = SubscriptionPlan::query()->findOrFail($subscription->subscription_plan_id);
@@ -212,6 +224,22 @@ class SubscriptionController extends Controller
         return redirect()
             ->route('subscription.index')
             ->with('status', "Pembayaran simulasi berhasil. Paket {$plan->name} sekarang aktif.");
+    }
+
+    public function cancelFakePayment(Request $request, Subscription $subscription): RedirectResponse
+    {
+        $this->authorizeFakePayment($request, $subscription);
+
+        $subscription->update([
+            'status' => 'failed',
+            'metadata' => array_merge($subscription->metadata ?? [], [
+                'fake_cancelled_at' => now()->toISOString(),
+            ]),
+        ]);
+
+        return redirect()
+            ->route('subscription.index')
+            ->with('status', 'Pembayaran simulasi dibatalkan. Paket Anda tidak berubah.');
     }
 
     public function updateTenant(Request $request): RedirectResponse
@@ -300,6 +328,7 @@ class SubscriptionController extends Controller
                 'source' => 'owner-panel',
                 'amount' => $amount,
                 'reference' => $reference,
+                'expires_at' => now()->addDay()->toISOString(),
             ],
         ]);
 
@@ -316,6 +345,24 @@ class SubscriptionController extends Controller
     {
         abort_unless($subscription->tenant_id === $request->user()->tenant_id, 403);
         abort_unless($subscription->provider === 'fake' && $subscription->status === 'pending', 404);
+    }
+
+    private function expireFakePaymentIfNeeded(Subscription $subscription): bool
+    {
+        $expiresAt = $subscription->metadata['expires_at'] ?? null;
+
+        if (! $expiresAt || now()->lessThanOrEqualTo(\Illuminate\Support\Carbon::parse($expiresAt))) {
+            return false;
+        }
+
+        $subscription->update([
+            'status' => 'failed',
+            'metadata' => array_merge($subscription->metadata ?? [], [
+                'fake_expired_at' => now()->toISOString(),
+            ]),
+        ]);
+
+        return true;
     }
 
     private function createMidtransPayment(Request $request, Tenant $tenant, SubscriptionPlan $plan): RedirectResponse
