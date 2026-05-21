@@ -277,6 +277,8 @@
         let currentProductPage = 1;
         let barcodeStream = null;
         let barcodeLoopActive = false;
+        let zxingReader = null;
+        let zxingControls = null;
 
         const rupiah = value => `Rp ${formatter.format(Math.max(0, Number(value) || 0))}`;
         const escapeHtml = value => String(value)
@@ -445,6 +447,14 @@
 
         async function closeBarcodeScanner() {
             barcodeLoopActive = false;
+            if (zxingControls?.stop) {
+                zxingControls.stop();
+                zxingControls = null;
+            }
+            if (zxingReader?.reset) {
+                zxingReader.reset();
+                zxingReader = null;
+            }
             if (barcodeStream) {
                 barcodeStream.getTracks().forEach(track => track.stop());
                 barcodeStream = null;
@@ -452,17 +462,75 @@
             if (barcodeModal) barcodeModal.style.display = 'none';
         }
 
+        function loadZxingLibrary() {
+            if (window.ZXingBrowser || window.ZXing) {
+                return Promise.resolve();
+            }
+
+            return new Promise((resolve, reject) => {
+                const existing = document.querySelector('script[data-zxing-fallback]');
+                if (existing) {
+                    existing.addEventListener('load', resolve, { once: true });
+                    existing.addEventListener('error', reject, { once: true });
+                    return;
+                }
+
+                const script = document.createElement('script');
+                script.src = 'https://unpkg.com/@zxing/library@0.21.3/umd/index.min.js';
+                script.async = true;
+                script.dataset.zxingFallback = 'true';
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+        }
+
+        async function scanWithZxingFallback() {
+            barcodeStatus.textContent = 'Memuat scanner kamera alternatif...';
+            await loadZxingLibrary();
+
+            const zxing = window.ZXingBrowser || window.ZXing;
+
+            if (!zxing?.BrowserMultiFormatReader) {
+                throw new Error('ZXing fallback is not available.');
+            }
+
+            zxingReader = new zxing.BrowserMultiFormatReader();
+            barcodeStatus.textContent = 'Kamera aktif. Arahkan ke barcode produk.';
+
+            const controls = await zxingReader.decodeFromVideoDevice(null, barcodeVideo, async (result) => {
+                if (!result) return;
+
+                const value = result.getText ? result.getText() : result.text;
+                const found = addByBarcode(value);
+                barcodeStatus.textContent = found
+                    ? `Produk ${value} masuk keranjang.`
+                    : `Barcode ${value} tidak ditemukan di SKU produk.`;
+
+                if (found) {
+                    await closeBarcodeScanner();
+                }
+            });
+
+            if (controls?.stop) {
+                zxingControls = controls;
+            }
+        }
+
         async function openBarcodeScanner() {
             if (!barcodeModal || !barcodeVideo || !barcodeStatus) return;
 
-            if (!('BarcodeDetector' in window)) {
-                barcodeStatus.textContent = 'Browser ini belum mendukung kamera barcode. Pakai scanner USB/HP lalu scan ke kolom pencarian dan tekan Enter.';
-                barcodeModal.style.display = 'flex';
-                return;
-            }
-
             barcodeModal.style.display = 'flex';
             barcodeStatus.textContent = 'Menyiapkan kamera...';
+
+            if (!('BarcodeDetector' in window)) {
+                try {
+                    await scanWithZxingFallback();
+                } catch (error) {
+                    barcodeStatus.textContent = 'Scanner kamera alternatif gagal dimuat. Pakai scanner USB/HP lalu scan ke kolom pencarian dan tekan Enter.';
+                }
+                return;
+            }
 
             try {
                 barcodeStream = await navigator.mediaDevices.getUserMedia({
