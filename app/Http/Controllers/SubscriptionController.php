@@ -15,7 +15,14 @@ class SubscriptionController extends Controller
     {
         $tenant = $request->user()->tenant?->load(['subscriptionPlan', 'stores', 'products', 'users']);
 
-        $plans = SubscriptionPlan::query()->orderBy('price')->get();
+        $plans = SubscriptionPlan::query()
+            ->where('code', 'full')
+            ->orderBy('price')
+            ->get();
+
+        if ($plans->isEmpty()) {
+            $plans = SubscriptionPlan::query()->orderBy('price')->get();
+        }
 
         $latestSubscription = Subscription::query()
             ->where('tenant_id', $request->user()->tenant_id)

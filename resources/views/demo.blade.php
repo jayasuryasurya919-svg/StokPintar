@@ -98,11 +98,11 @@ th{font-size:12px;text-transform:uppercase;color:var(--muted)}
       </div>
       <div class="actions">
         <a class="btn" href="{{ route('home') }}">Kembali</a>
-        <a class="btn primary" href="{{ route('register') }}">Coba Gratis</a>
+        <a class="btn primary" href="{{ route('register') }}">Aktifkan Full Setup</a>
       </div>
     </header>
 
-    <div class="notice">Demo ini tidak menyimpan data ke database. Untuk transaksi nyata, role tim, dan laporan toko asli, buat akun toko gratis.</div>
+    <div class="notice">Demo ini tidak menyimpan data ke database. Untuk transaksi nyata, role tim, dan laporan toko asli, buat akun toko full setup.</div>
 
     <section class="view active" data-demo-view="dashboard">
       <div class="grid-4">

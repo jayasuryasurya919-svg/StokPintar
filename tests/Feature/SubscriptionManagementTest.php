@@ -28,8 +28,8 @@ class SubscriptionManagementTest extends TestCase
         $this->actingAs($owner)
             ->get(route('subscription.index'))
             ->assertOk()
-            ->assertSee('Subscription')
-            ->assertSee('Pilih Paket');
+            ->assertSee('Full Setup')
+            ->assertSee('Fitur Aktif');
     }
 
     public function test_owner_can_switch_subscription_plan_and_subscription_record_is_created(): void

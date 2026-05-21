@@ -47,15 +47,17 @@
                 </div>
             </div>
 
-            <details class="card compact" style="margin:0;">
-                <summary class="btn small">Opsi Lanjutan: Shift & Cabang</summary>
+            <details class="card compact user-access-panel" style="margin:0;">
+                <summary class="btn small user-access-summary">Opsi Lanjutan: Shift & Cabang</summary>
 
-                <div class="form-grid" style="margin-top:16px;">
-                    <div style="grid-column:1 / -1;">
-                        <h3 style="margin:0 0 4px;">Jam Akses</h3>
-                        <p class="muted" style="font-size:13px; margin:0 0 12px;">Kosongkan semua hari untuk akses 24 jam.</p>
+                <div class="user-access-content">
+                    <section class="user-access-section">
+                        <div class="user-access-heading">
+                            <h3>Jam Akses</h3>
+                            <p class="muted">Kosongkan semua hari untuk akses 24 jam.</p>
+                        </div>
 
-                        <div style="display:grid; gap:8px; max-width:560px;">
+                        <div class="schedule-list">
                             @php
                                 $days = [
                                     1 => 'Senin',
@@ -76,36 +78,40 @@
                                     $start = old("schedules.{$dayNum}.start_time", $sched ? \Carbon\Carbon::parse($sched->start_time)->format('H:i') : '08:00');
                                     $end = old("schedules.{$dayNum}.end_time", $sched ? \Carbon\Carbon::parse($sched->end_time)->format('H:i') : '17:00');
                                 @endphp
-                                <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding:8px; border:1px solid var(--border); border-radius:8px; background:var(--surface);">
-                                    <label style="display:flex; align-items:center; gap:8px; width:96px; margin:0;">
-                                        <input type="checkbox" name="schedules[{{ $dayNum }}][active]" value="1" {{ $isActive ? 'checked' : '' }}>
-                                        <span>{{ $dayName }}</span>
+                                <div class="schedule-row">
+                                    <label class="schedule-day">
+                                        <input class="schedule-check" type="checkbox" name="schedules[{{ $dayNum }}][active]" value="1" {{ $isActive ? 'checked' : '' }}>
+                                        <span class="schedule-day-name">{{ $dayName }}</span>
                                     </label>
-                                    <input type="time" name="schedules[{{ $dayNum }}][start_time]" value="{{ $start }}" style="width:auto; padding:4px 8px;">
-                                    <span class="muted">s/d</span>
-                                    <input type="time" name="schedules[{{ $dayNum }}][end_time]" value="{{ $end }}" style="width:auto; padding:4px 8px;">
+                                    <div class="schedule-time-range">
+                                        <input type="time" name="schedules[{{ $dayNum }}][start_time]" value="{{ $start }}">
+                                        <span class="muted">s/d</span>
+                                        <input type="time" name="schedules[{{ $dayNum }}][end_time]" value="{{ $end }}">
+                                    </div>
                                 </div>
                             @endforeach
                         </div>
-                    </div>
+                    </section>
 
-                    <div style="grid-column:1 / -1;">
-                        <h3 style="margin:12px 0 4px;">Akses Cabang</h3>
-                        <p class="muted" style="font-size:13px; margin:0 0 12px;">Tidak memilih cabang berarti akses semua cabang.</p>
+                    <section class="user-access-section">
+                        <div class="user-access-heading">
+                            <h3>Akses Cabang</h3>
+                            <p class="muted">Tidak memilih cabang berarti akses semua cabang.</p>
+                        </div>
 
-                        <div style="display:flex; flex-wrap:wrap; gap:10px;">
+                        <div class="store-access-grid">
                             @php
                                 $selectedStores = old('stores', $userModel->storeAccess->pluck('id')->toArray());
                             @endphp
 
                             @foreach($stores as $store)
-                                <label style="display:flex; align-items:center; gap:8px; cursor:pointer; padding:8px 12px; border:1px solid var(--border); border-radius:8px; background:var(--surface);">
-                                    <input type="checkbox" name="stores[]" value="{{ $store->id }}" {{ in_array($store->id, $selectedStores) ? 'checked' : '' }}>
+                                <label class="store-access-card">
+                                    <input class="schedule-check" type="checkbox" name="stores[]" value="{{ $store->id }}" {{ in_array($store->id, $selectedStores) ? 'checked' : '' }}>
                                     <span>{{ $store->name }}</span>
                                 </label>
                             @endforeach
                         </div>
-                    </div>
+                    </section>
                 </div>
             </details>
 
@@ -115,4 +121,113 @@
             </div>
         </form>
     </section>
+
+    <style>
+        .user-access-panel {
+            overflow: visible;
+        }
+
+        .user-access-summary {
+            width: fit-content;
+        }
+
+        .user-access-content {
+            display: grid;
+            gap: 22px;
+            margin-top: 18px;
+        }
+
+        .user-access-section {
+            display: grid;
+            gap: 12px;
+        }
+
+        .user-access-heading h3 {
+            margin: 0 0 4px;
+            font-size: 18px;
+        }
+
+        .user-access-heading p {
+            margin: 0;
+            font-size: 13px;
+        }
+
+        .schedule-list {
+            display: grid;
+            gap: 8px;
+            max-width: 620px;
+        }
+
+        .schedule-row {
+            display: grid;
+            grid-template-columns: 128px minmax(220px, 1fr);
+            align-items: center;
+            gap: 14px;
+            padding: 10px 12px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: var(--surface-low);
+        }
+
+        .schedule-day,
+        .store-access-card {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .schedule-check {
+            width: 20px;
+            height: 20px;
+            flex: 0 0 auto;
+        }
+
+        .schedule-day-name {
+            min-width: 64px;
+        }
+
+        .schedule-time-range {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+            align-items: center;
+            gap: 10px;
+        }
+
+        .schedule-time-range input[type="time"] {
+            width: 100%;
+            min-width: 0;
+            height: 42px;
+            padding: 8px 10px;
+        }
+
+        .store-access-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 10px;
+            max-width: 720px;
+        }
+
+        .store-access-card {
+            min-height: 48px;
+            padding: 10px 12px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: var(--surface-low);
+        }
+
+        @media (max-width: 640px) {
+            .schedule-row {
+                grid-template-columns: 1fr;
+                align-items: stretch;
+                gap: 8px;
+            }
+
+            .schedule-time-range {
+                grid-template-columns: 1fr auto 1fr;
+            }
+        }
+    </style>
 @endsection

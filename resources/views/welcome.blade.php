@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>StokPintar — SaaS Stok & Kasir untuk UMKM Indonesia</title>
-<meta name="description" content="Kelola stok, catat penjualan, dan pantau laporan bisnis UMKM Anda dari browser. Gratis untuk mulai.">
+<meta name="description" content="Kelola stok, POS, laporan, barcode, cabang, tim, dan resep F&B UMKM Anda dari browser. Semua fitur aktif.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -131,7 +131,7 @@ footer strong{color:var(--g3)}
     <a href="#fitur">Fitur</a>
     <a href="#harga">Harga</a>
     <a href="{{ route('login') }}" class="btn btn-outline" style="padding:8px 16px">Masuk</a>
-    <a href="{{ route('register') }}" class="btn btn-primary">Coba Gratis →</a>
+    <a href="{{ route('register') }}" class="btn btn-primary">Aktifkan Full Setup</a>
   </div>
 </nav>
 
@@ -143,7 +143,7 @@ footer strong{color:var(--g3)}
     <h1>Stok Pintar,<br><em>Bisnis Lancar.</em></h1>
     <p>Platform manajemen stok & kasir berbasis web untuk warung, toko kelontong, dan UMKM. Tanpa instal aplikasi, langsung pakai dari browser.</p>
     <div class="hero-actions">
-      <a href="{{ route('register') }}" class="btn btn-primary" style="padding:14px 28px;font-size:16px">Mulai Gratis 14 Hari →</a>
+      <a href="{{ route('register') }}" class="btn btn-primary" style="padding:14px 28px;font-size:16px">Mulai Full Setup</a>
       <a href="{{ route('demo') }}" class="btn btn-outline" style="padding:14px 28px;font-size:16px">Lihat Demo</a>
     </div>
     <div class="hero-trust">
@@ -231,53 +231,27 @@ footer strong{color:var(--g3)}
   </div>
 </section>
 
-<!-- PRICING -->
+<!-- FULL SETUP -->
 <section class="pricing" id="harga">
   <div class="pricing-inner">
     <div class="pricing-header">
-      <div class="section-label" style="text-align:center">Harga Transparan</div>
-      <h2 class="section-title" style="text-align:center">Mulai gratis, upgrade kapan saja</h2>
+      <div class="section-label" style="text-align:center">Full Setup</div>
+      <h2 class="section-title" style="text-align:center">Satu versi full, semua fitur aktif</h2>
     </div>
     <div class="plan-grid">
-      <div class="plan-card">
-        <div class="plan-name">Gratis</div>
-        <div class="plan-price">Rp 0<small>/bulan</small></div>
-        <div class="plan-desc">Cocok untuk toko baru yang baru mulai digital.</div>
-        <ul class="plan-features">
-          <li>Hingga 50 produk</li>
-          <li>2 user (Owner + 1 kasir)</li>
-          <li>POS kasir dasar</li>
-          <li class="no">Export PDF/Excel</li>
-          <li class="no">Laporan lengkap</li>
-        </ul>
-        <a href="{{ route('register') }}" class="btn btn-outline" style="width:100%;justify-content:center">Mulai Gratis</a>
-      </div>
       <div class="plan-card popular">
-        <div class="plan-badge">Paling Populer</div>
-        <div class="plan-name">Starter</div>
-        <div class="plan-price">Rp 49rb<small>/bulan</small></div>
-        <div class="plan-desc">Untuk toko yang sudah aktif berjualan setiap hari.</div>
+        <div class="plan-badge">Semua Fitur</div>
+        <div class="plan-name">StokPintar Full</div>
+        <div class="plan-price">Full<small> setup</small></div>
+        <div class="plan-desc">Untuk retail, minimarket, apotek, kedai kopi, warung makan, dan multi cabang.</div>
         <ul class="plan-features">
-          <li>Hingga 500 produk</li>
-          <li>5 user (berbagai role)</li>
-          <li>POS kasir + struk PDF</li>
-          <li>Export PDF & Excel</li>
-          <li>Alert stok otomatis</li>
+          <li>Produk, user, cabang, dan laporan unlimited</li>
+          <li>POS kasir, struk, export PDF & Excel</li>
+          <li>Barcode scanner dan alert stok</li>
+          <li>Resep F&B dan stok bahan baku</li>
+          <li>Role tim, shift, akses cabang, dan audit aktivitas</li>
         </ul>
-        <a href="{{ route('register') }}" class="btn btn-primary" style="width:100%;justify-content:center">Coba 14 Hari Gratis →</a>
-      </div>
-      <div class="plan-card">
-        <div class="plan-name">Pro</div>
-        <div class="plan-price">Rp 99rb<small>/bulan</small></div>
-        <div class="plan-desc">Untuk chain toko atau bisnis yang berkembang pesat.</div>
-        <ul class="plan-features">
-          <li>Produk & user unlimited</li>
-          <li>Hingga 5 cabang toko</li>
-          <li>Semua fitur Starter</li>
-          <li>Akses API</li>
-          <li>Priority support</li>
-        </ul>
-        <a href="{{ route('register') }}" class="btn btn-outline" style="width:100%;justify-content:center">Pilih Pro</a>
+        <a href="{{ route('register') }}" class="btn btn-primary" style="width:100%;justify-content:center">Aktifkan Full Setup</a>
       </div>
     </div>
   </div>
@@ -286,8 +260,8 @@ footer strong{color:var(--g3)}
 <!-- CTA -->
 <section class="cta">
   <h2>Siap digitalisasi toko Anda?</h2>
-  <p>Mulai kelola stok, POS, laporan, dan akses tim toko Anda dari satu aplikasi web. Gratis 14 hari, tanpa kartu kredit.</p>
-  <a href="{{ route('register') }}" class="btn-light btn">Daftar Sekarang — Gratis! →</a>
+  <p>Mulai kelola stok, POS, laporan, barcode, cabang, resep F&B, dan akses tim toko Anda dari satu aplikasi web.</p>
+  <a href="{{ route('register') }}" class="btn-light btn">Daftar Sekarang</a>
 </section>
 
 <footer>

@@ -74,15 +74,26 @@ class AuthController extends Controller
         ]);
 
         $plan = SubscriptionPlan::query()->firstOrCreate(
-            ['code' => 'free'],
+            ['code' => 'full'],
             [
-                'name' => 'Gratis',
+                'name' => 'Full Setup',
                 'price' => 0,
-                'max_stores' => 1,
-                'max_products' => 50,
-                'max_users' => 2,
-                'report_retention_days' => 7,
-                'features' => ['basic_pos'],
+                'max_stores' => null,
+                'max_products' => null,
+                'max_users' => null,
+                'report_retention_days' => null,
+                'features' => [
+                    'basic_pos',
+                    'stock_alerts',
+                    'pdf_export',
+                    'excel_export',
+                    'multi_store',
+                    'team_access',
+                    'fnb_recipes',
+                    'barcode_scanner',
+                    'activity_logs',
+                    'priority_support',
+                ],
             ],
         );
 
@@ -98,8 +109,9 @@ class AuthController extends Controller
             'subscription_plan_id' => $plan->id,
             'name' => $data['store_name'],
             'slug' => Str::slug($data['store_name']).'-'.Str::lower(Str::random(5)),
-            'status' => 'trial',
-            'trial_ends_at' => now()->addDays(14),
+            'status' => 'active',
+            'trial_ends_at' => null,
+            'subscription_ends_at' => null,
         ]);
 
         Store::withoutGlobalScopes()->create([

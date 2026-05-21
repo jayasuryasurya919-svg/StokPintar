@@ -38,6 +38,8 @@ class DatabaseSeeder extends Seeder
         foreach ($this->storeDatasets() as $index => $dataset) {
             $this->seedStoreTenant($dataset, $plans, $index + 1);
         }
+
+        $this->migrateLegacyPlansToFullSetup($plans['full']);
     }
 
     /**
@@ -46,34 +48,51 @@ class DatabaseSeeder extends Seeder
     private function seedPlans(): array
     {
         return [
-            'free' => SubscriptionPlan::query()->updateOrCreate(['code' => 'free'], [
-                'name' => 'Gratis',
+            'full' => SubscriptionPlan::query()->updateOrCreate(['code' => 'full'], [
+                'name' => 'Full Setup',
                 'price' => 0,
-                'max_stores' => 1,
-                'max_products' => 50,
-                'max_users' => 2,
-                'report_retention_days' => 7,
-                'features' => ['basic_pos'],
-            ]),
-            'starter' => SubscriptionPlan::query()->updateOrCreate(['code' => 'starter'], [
-                'name' => 'Starter',
-                'price' => 49000,
-                'max_stores' => 1,
-                'max_products' => 500,
-                'max_users' => 5,
-                'report_retention_days' => 30,
-                'features' => ['basic_pos', 'stock_alerts', 'pdf_export', 'excel_export'],
-            ]),
-            'pro' => SubscriptionPlan::query()->updateOrCreate(['code' => 'pro'], [
-                'name' => 'Pro',
-                'price' => 99000,
-                'max_stores' => 5,
                 'max_products' => null,
                 'max_users' => null,
+                'max_stores' => null,
                 'report_retention_days' => null,
-                'features' => ['basic_pos', 'stock_alerts', 'pdf_export', 'excel_export', 'api_access', 'priority_support'],
+                'features' => [
+                    'basic_pos',
+                    'stock_alerts',
+                    'pdf_export',
+                    'excel_export',
+                    'multi_store',
+                    'team_access',
+                    'fnb_recipes',
+                    'barcode_scanner',
+                    'activity_logs',
+                    'api_access',
+                    'priority_support',
+                ],
             ]),
         ];
+    }
+
+    private function migrateLegacyPlansToFullSetup(SubscriptionPlan $fullPlan): void
+    {
+        $legacyPlanIds = SubscriptionPlan::query()
+            ->whereIn('code', ['free', 'starter', 'pro'])
+            ->pluck('id');
+
+        if ($legacyPlanIds->isEmpty()) {
+            return;
+        }
+
+        Tenant::query()
+            ->whereIn('subscription_plan_id', $legacyPlanIds)
+            ->update(['subscription_plan_id' => $fullPlan->id]);
+
+        Subscription::withoutGlobalScopes()
+            ->whereIn('subscription_plan_id', $legacyPlanIds)
+            ->update(['subscription_plan_id' => $fullPlan->id]);
+
+        SubscriptionPlan::query()
+            ->whereIn('id', $legacyPlanIds)
+            ->delete();
     }
 
     /**
@@ -404,7 +423,7 @@ class DatabaseSeeder extends Seeder
                 'tenant_name' => 'Toko Maju Jaya',
                 'store_name' => 'Toko Maju Jaya Bandung',
                 'slug' => 'toko-maju-jaya',
-                'plan' => 'starter',
+                'plan' => 'full',
                 'status' => 'active',
                 'owner_name' => 'Budi Santoso',
                 'owner_email' => 'owner@stokpintar.test',
@@ -425,7 +444,7 @@ class DatabaseSeeder extends Seeder
                 'tenant_name' => 'Apotek Sehat Sentosa',
                 'store_name' => 'Apotek Sehat Sentosa',
                 'slug' => 'apotek-sehat-sentosa',
-                'plan' => 'pro',
+                'plan' => 'full',
                 'status' => 'active',
                 'owner_name' => 'dr. Rina Prameswari',
                 'owner_email' => 'owner@apotek-sehat-sentosa.test',
@@ -446,7 +465,7 @@ class DatabaseSeeder extends Seeder
                 'tenant_name' => 'Kedai Kopi Senja',
                 'store_name' => 'Kedai Kopi Senja Surabaya',
                 'slug' => 'kedai-kopi-senja',
-                'plan' => 'starter',
+                'plan' => 'full',
                 'status' => 'trial',
                 'owner_name' => 'Arman Hakim',
                 'owner_email' => 'owner@kedai-kopi-senja.test',
@@ -471,7 +490,7 @@ class DatabaseSeeder extends Seeder
                 'tenant_name' => 'Minimarket FreshMart',
                 'store_name' => 'FreshMart Bekasi',
                 'slug' => 'minimarket-freshmart',
-                'plan' => 'pro',
+                'plan' => 'full',
                 'status' => 'active',
                 'owner_name' => 'Dewi Lestari',
                 'owner_email' => 'owner@minimarket-freshmart.test',
@@ -492,7 +511,7 @@ class DatabaseSeeder extends Seeder
                 'tenant_name' => 'Toko Bangunan Hijau',
                 'store_name' => 'Toko Bangunan Hijau Malang',
                 'slug' => 'toko-bangunan-hijau',
-                'plan' => 'starter',
+                'plan' => 'full',
                 'status' => 'active',
                 'owner_name' => 'Hendra Wijaya',
                 'owner_email' => 'owner@toko-bangunan-hijau.test',
