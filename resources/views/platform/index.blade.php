@@ -117,88 +117,137 @@
             </div>
         </section>
 
-        <div class="grid-2">
-            <section class="card">
-                <details>
-                    <summary class="btn primary">Buat Paket Baru</summary>
-                    <form method="POST" action="{{ route('platform.plans.store') }}" class="stack" style="margin-top:12px;">
-                        @csrf
-                        <div class="form-grid">
-                            <div class="field">
-                                <label for="plan_code">Code</label>
-                                <input id="plan_code" name="code" value="{{ old('code') }}" required>
-                            </div>
-                            <div class="field">
-                                <label for="plan_name">Nama Paket</label>
-                                <input id="plan_name" name="name" value="{{ old('name') }}" required>
-                            </div>
-                            <div class="field">
-                                <label for="plan_price">Harga Bulanan</label>
-                                <input id="plan_price" name="price" type="number" min="0" value="{{ old('price', 0) }}" required>
-                            </div>
-                            <div class="field">
-                                <label for="plan_max_stores">Max Store</label>
-                                <input id="plan_max_stores" name="max_stores" type="number" min="1" value="{{ old('max_stores') }}">
-                            </div>
-                            <div class="field">
-                                <label for="plan_max_products">Max Produk</label>
-                                <input id="plan_max_products" name="max_products" type="number" min="1" value="{{ old('max_products') }}">
-                            </div>
-                            <div class="field">
-                                <label for="plan_max_users">Max User</label>
-                                <input id="plan_max_users" name="max_users" type="number" min="1" value="{{ old('max_users') }}">
-                            </div>
-                        </div>
-                        <div class="form-actions">
-                            <button class="btn primary" type="submit">Tambah</button>
-                        </div>
-                    </form>
-                </details>
-            </section>
-
-            <section class="card">
-                <div class="section-title">
-                    <h2>Katalog Paket</h2>
+        <section class="card flush">
+            <div class="panel-header">
+                <h2>Katalog Paket</h2>
+                <div class="action-row" style="gap:10px;">
                     <span class="badge">{{ $plans->count() }} paket</span>
-                </div>
-                <div class="stack">
-                    @foreach($plans as $plan)
-                        <article class="card compact">
-                            <div class="section-title" style="margin-bottom:10px">
-                                <div>
-                                    <p class="metric-label">{{ strtoupper($plan->code) }}</p>
-                                    <h3 style="margin:0;font-size:20px">{{ $plan->name }}</h3>
+                    <details>
+                        <summary class="btn primary small">Buat Paket</summary>
+                        <form method="POST" action="{{ route('platform.plans.store') }}" class="stack compact-popover">
+                            @csrf
+                            <div class="form-grid">
+                                <div class="field">
+                                    <label for="plan_code">Code</label>
+                                    <input id="plan_code" name="code" value="{{ old('code') }}" required>
                                 </div>
-                                <span class="badge money">{{ $plan->tenants_count }} tenant</span>
+                                <div class="field">
+                                    <label for="plan_name">Nama</label>
+                                    <input id="plan_name" name="name" value="{{ old('name') }}" required>
+                                </div>
+                                <div class="field">
+                                    <label for="plan_price">Harga</label>
+                                    <input id="plan_price" name="price" type="number" min="0" value="{{ old('price', 0) }}" required>
+                                </div>
+                                <div class="field">
+                                    <label for="plan_max_stores">Max Store</label>
+                                    <input id="plan_max_stores" name="max_stores" type="number" min="1" value="{{ old('max_stores') }}">
+                                </div>
+                                <div class="field">
+                                    <label for="plan_max_products">Max Produk</label>
+                                    <input id="plan_max_products" name="max_products" type="number" min="1" value="{{ old('max_products') }}">
+                                </div>
+                                <div class="field">
+                                    <label for="plan_max_users">Max User</label>
+                                    <input id="plan_max_users" name="max_users" type="number" min="1" value="{{ old('max_users') }}">
+                                </div>
                             </div>
-                            <details>
-                                <summary class="btn small">Edit Paket</summary>
-                                <form method="POST" action="{{ route('platform.plans.update', $plan) }}" class="stack" style="margin-top:12px;">
-                                    @csrf
-                                    @method('PUT')
-                                    <div class="form-grid">
-                                        <div class="field">
-                                            <label for="code-{{ $plan->id }}">Code</label>
-                                            <input id="code-{{ $plan->id }}" name="code" value="{{ $plan->code }}" required>
-                                        </div>
-                                        <div class="field">
-                                            <label for="name-{{ $plan->id }}">Nama Paket</label>
-                                            <input id="name-{{ $plan->id }}" name="name" value="{{ $plan->name }}" required>
-                                        </div>
-                                        <div class="field">
-                                            <label for="price-{{ $plan->id }}">Harga</label>
-                                            <input id="price-{{ $plan->id }}" name="price" type="number" min="0" value="{{ $plan->price }}" required>
-                                        </div>
-                                    </div>
-                                    <div class="form-actions">
-                                        <button class="btn primary" type="submit">Update</button>
-                                    </div>
-                                </form>
-                            </details>
-                        </article>
-                    @endforeach
+                            <div class="form-actions">
+                                <button class="btn primary small" type="submit">Tambah Paket</button>
+                            </div>
+                        </form>
+                    </details>
                 </div>
-            </section>
-        </div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Paket</th>
+                            <th>Harga</th>
+                            <th>Kapasitas</th>
+                            <th>Fitur</th>
+                            <th>Tenant</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($plans as $plan)
+                            <tr>
+                                <td>
+                                    <strong>{{ $plan->name }}</strong>
+                                    <div class="muted">{{ strtoupper($plan->code) }}</div>
+                                </td>
+                                <td>{{ $plan->price > 0 ? 'Rp '.number_format($plan->price, 0, ',', '.') : 'Gratis' }}</td>
+                                <td>
+                                    <div class="muted">{{ $plan->max_stores ?? 'Unlimited' }} toko</div>
+                                    <div class="muted">{{ $plan->max_products ?? 'Unlimited' }} produk</div>
+                                    <div class="muted">{{ $plan->max_users ?? 'Unlimited' }} user</div>
+                                </td>
+                                <td>
+                                    <div class="muted">{{ $plan->report_retention_days ? 'Laporan '.$plan->report_retention_days.' hari' : 'Laporan unlimited' }}</div>
+                                    @if(in_array('priority_support', $plan->features ?? [], true))
+                                        <span class="badge ok" style="margin-top:4px;">Priority Support</span>
+                                    @else
+                                        <span class="muted">Standard support</span>
+                                    @endif
+                                </td>
+                                <td><span class="badge money">{{ $plan->tenants_count }} tenant</span></td>
+                                <td>
+                                    <details>
+                                        <summary class="btn small">Edit</summary>
+                                        <form method="POST" action="{{ route('platform.plans.update', $plan) }}" class="stack compact-popover">
+                                            @csrf
+                                            @method('PUT')
+                                            <div class="form-grid">
+                                                <div class="field">
+                                                    <label for="code-{{ $plan->id }}">Code</label>
+                                                    <input id="code-{{ $plan->id }}" name="code" value="{{ $plan->code }}" required>
+                                                </div>
+                                                <div class="field">
+                                                    <label for="name-{{ $plan->id }}">Nama</label>
+                                                    <input id="name-{{ $plan->id }}" name="name" value="{{ $plan->name }}" required>
+                                                </div>
+                                                <div class="field">
+                                                    <label for="price-{{ $plan->id }}">Harga</label>
+                                                    <input id="price-{{ $plan->id }}" name="price" type="number" min="0" value="{{ $plan->price }}" required>
+                                                </div>
+                                            </div>
+                                            <div class="form-actions">
+                                                <button class="btn primary small" type="submit">Update</button>
+                                            </div>
+                                        </form>
+                                    </details>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </section>
     </div>
+
+    <style>
+        .compact-popover {
+            position: absolute;
+            right: 0;
+            z-index: 20;
+            width: min(560px, calc(100vw - 48px));
+            margin-top: 8px;
+            padding: 16px;
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            box-shadow: 0 18px 44px rgba(11,28,48,.16);
+        }
+        .panel-header details,
+        td details {
+            position: relative;
+        }
+        td .compact-popover {
+            position: static;
+            width: min(460px, 78vw);
+            box-shadow: none;
+        }
+    </style>
 @endsection
