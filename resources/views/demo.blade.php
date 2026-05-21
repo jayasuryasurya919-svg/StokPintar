@@ -98,7 +98,7 @@ th{font-size:12px;text-transform:uppercase;color:var(--muted)}
       </div>
       <div class="actions">
         <a class="btn" href="{{ route('home') }}">Kembali</a>
-        <a class="btn primary" href="{{ route('register') }}">Aktifkan Full Setup</a>
+        <a class="btn primary" href="{{ route('register') }}">Mulai Free</a>
       </div>
     </header>
 

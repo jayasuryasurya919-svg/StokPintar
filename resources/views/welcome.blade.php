@@ -131,7 +131,7 @@ footer strong{color:var(--g3)}
     <a href="#fitur">Fitur</a>
     <a href="#harga">Harga</a>
     <a href="{{ route('login') }}" class="btn btn-outline" style="padding:8px 16px">Masuk</a>
-    <a href="{{ route('register') }}" class="btn btn-primary">Aktifkan Full Setup</a>
+    <a href="{{ route('register') }}" class="btn btn-primary">Mulai Free</a>
   </div>
 </nav>
 
@@ -143,7 +143,7 @@ footer strong{color:var(--g3)}
     <h1>Stok Pintar,<br><em>Bisnis Lancar.</em></h1>
     <p>Platform manajemen stok & kasir berbasis web untuk warung, toko kelontong, dan UMKM. Tanpa instal aplikasi, langsung pakai dari browser.</p>
     <div class="hero-actions">
-      <a href="{{ route('register') }}" class="btn btn-primary" style="padding:14px 28px;font-size:16px">Mulai Full Setup</a>
+      <a href="{{ route('register') }}" class="btn btn-primary" style="padding:14px 28px;font-size:16px">Mulai Free</a>
       <a href="{{ route('demo') }}" class="btn btn-outline" style="padding:14px 28px;font-size:16px">Lihat Demo</a>
     </div>
     <div class="hero-trust">
@@ -231,27 +231,62 @@ footer strong{color:var(--g3)}
   </div>
 </section>
 
-<!-- FULL SETUP -->
+<!-- PRICING -->
 <section class="pricing" id="harga">
   <div class="pricing-inner">
     <div class="pricing-header">
-      <div class="section-label" style="text-align:center">Full Setup</div>
-      <h2 class="section-title" style="text-align:center">Satu versi full, semua fitur aktif</h2>
+      <div class="section-label" style="text-align:center">Harga Transparan</div>
+      <h2 class="section-title" style="text-align:center">Pilih paket, semua tetap full setup</h2>
     </div>
     <div class="plan-grid">
-      <div class="plan-card popular">
-        <div class="plan-badge">Semua Fitur</div>
-        <div class="plan-name">StokPintar Full</div>
-        <div class="plan-price">Full<small> setup</small></div>
-        <div class="plan-desc">Untuk retail, minimarket, apotek, kedai kopi, warung makan, dan multi cabang.</div>
+      <div class="plan-card">
+        <div class="plan-name">Free</div>
+        <div class="plan-price">Rp 0<small>/bulan</small></div>
+        <div class="plan-desc">Untuk mulai digital dengan fitur inti yang tetap lengkap.</div>
         <ul class="plan-features">
-          <li>Produk, user, cabang, dan laporan unlimited</li>
-          <li>POS kasir, struk, export PDF & Excel</li>
-          <li>Barcode scanner dan alert stok</li>
-          <li>Resep F&B dan stok bahan baku</li>
-          <li>Role tim, shift, akses cabang, dan audit aktivitas</li>
+          <li>1 toko, 50 produk, 2 user</li>
+          <li>POS, barcode, stok, dan resep F&B</li>
+          <li>Export PDF/Excel</li>
+          <li>Laporan 7 hari</li>
         </ul>
-        <a href="{{ route('register') }}" class="btn btn-primary" style="width:100%;justify-content:center">Aktifkan Full Setup</a>
+        <a href="{{ route('register') }}" class="btn btn-outline" style="width:100%;justify-content:center">Mulai Free</a>
+      </div>
+      <div class="plan-card">
+        <div class="plan-name">Starter</div>
+        <div class="plan-price">Rp 49rb<small>/bulan</small></div>
+        <div class="plan-desc">Untuk toko yang aktif berjualan setiap hari.</div>
+        <ul class="plan-features">
+          <li>1 toko, 500 produk, 5 user</li>
+          <li>Semua fitur operasional aktif</li>
+          <li>Export dan struk branding</li>
+          <li>Laporan 30 hari</li>
+        </ul>
+        <a href="{{ route('register') }}" class="btn btn-outline" style="width:100%;justify-content:center">Pilih Starter</a>
+      </div>
+      <div class="plan-card popular">
+        <div class="plan-badge">Paling Populer</div>
+        <div class="plan-name">Pro</div>
+        <div class="plan-price">Rp 99rb<small>/bulan</small></div>
+        <div class="plan-desc">Untuk bisnis yang mulai butuh cabang dan tim lebih besar.</div>
+        <ul class="plan-features">
+          <li>5 cabang, produk & user unlimited</li>
+          <li>Semua fitur Starter</li>
+          <li>API access</li>
+          <li>Laporan unlimited</li>
+        </ul>
+        <a href="{{ route('register') }}" class="btn btn-primary" style="width:100%;justify-content:center">Pilih Pro</a>
+      </div>
+      <div class="plan-card">
+        <div class="plan-name">Business</div>
+        <div class="plan-price">Rp 199rb<small>/bulan</small></div>
+        <div class="plan-desc">Untuk operasional multi cabang yang butuh dukungan prioritas.</div>
+        <ul class="plan-features">
+          <li>Cabang, produk, user unlimited</li>
+          <li>Semua fitur Pro</li>
+          <li>Priority support</li>
+          <li>White label ready</li>
+        </ul>
+        <a href="{{ route('register') }}" class="btn btn-outline" style="width:100%;justify-content:center">Pilih Business</a>
       </div>
     </div>
   </div>

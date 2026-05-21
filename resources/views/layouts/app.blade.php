@@ -1274,7 +1274,7 @@
                     <a href="{{ route('users.index') }}" class="{{ request()->routeIs('users.*') ? 'active' : '' }}"><span class="material-symbols-outlined">groups</span> Tim & Akses</a>
                 @endif
                 @if(auth()->user()->canPermission('subscription.manage'))
-                    <a href="{{ route('subscription.index') }}" class="{{ request()->routeIs('subscription.*') ? 'active' : '' }}"><span class="material-symbols-outlined">workspace_premium</span> Full Setup</a>
+                    <a href="{{ route('subscription.index') }}" class="{{ request()->routeIs('subscription.*') ? 'active' : '' }}"><span class="material-symbols-outlined">workspace_premium</span> Paket & Setup</a>
                 @endif
                 @if(auth()->user()->canPermission('subscription.manage'))
                     <a href="{{ route('business-profile.edit') }}" class="{{ request()->routeIs('business-profile.*') ? 'active' : '' }}"><span class="material-symbols-outlined">storefront</span> Profil Bisnis</a>
