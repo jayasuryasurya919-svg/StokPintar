@@ -478,17 +478,11 @@
             color: var(--ink);
             font-weight: 800;
         }
-        .google-login-button span {
+        .google-login-button .google-mark {
             width: 24px;
             height: 24px;
-            border-radius: 999px;
-            display: grid;
-            place-items: center;
-            background: #fff;
-            border: 1px solid var(--line);
-            color: #4285f4;
-            font-weight: 900;
-            font-family: Arial, sans-serif;
+            flex: 0 0 auto;
+            display: block;
         }
         .auth-divider {
             display: flex;
