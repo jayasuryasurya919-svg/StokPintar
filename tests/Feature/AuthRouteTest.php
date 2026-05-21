@@ -30,16 +30,16 @@ class AuthRouteTest extends TestCase
         $this->assertContains('throttle:5,1', $updateRoute->gatherMiddleware());
     }
 
-    public function test_login_page_has_no_demo_credentials_or_dummy_auth_actions(): void
+    public function test_login_page_has_secure_auth_actions(): void
     {
         $this->get(route('login'))
             ->assertOk()
             ->assertSee('name="remember"', false)
             ->assertSee('data-password-toggle="password"', false)
             ->assertSee(route('password.request'), false)
+            ->assertSee(route('login.google'), false)
             ->assertDontSee('owner@stokpintar.test')
-            ->assertDontSee('value="password"', false)
-            ->assertDontSee('Masuk dengan Google');
+            ->assertDontSee('value="password"', false);
     }
 
     public function test_register_page_has_no_dummy_footer_links(): void

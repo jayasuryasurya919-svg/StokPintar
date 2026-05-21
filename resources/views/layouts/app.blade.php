@@ -469,6 +469,44 @@
         .auth-card header { margin-bottom: 32px; }
         .auth-card h1 { font-size: 24px; line-height: 32px; }
         .auth-brand-mobile { display: none; margin-bottom: 28px; }
+        .google-login-button {
+            width: 100%;
+            min-height: 46px;
+            margin-bottom: 18px;
+            background: white;
+            border-color: var(--line);
+            color: var(--ink);
+            font-weight: 800;
+        }
+        .google-login-button span {
+            width: 24px;
+            height: 24px;
+            border-radius: 999px;
+            display: grid;
+            place-items: center;
+            background: #fff;
+            border: 1px solid var(--line);
+            color: #4285f4;
+            font-weight: 900;
+            font-family: Arial, sans-serif;
+        }
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 0 0 18px;
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+        .auth-divider::before,
+        .auth-divider::after {
+            content: "";
+            height: 1px;
+            flex: 1;
+            background: var(--line);
+        }
         .icon-field { position: relative; }
         .icon-field > .material-symbols-outlined {
             position: absolute;

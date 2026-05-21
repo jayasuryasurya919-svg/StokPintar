@@ -30,6 +30,13 @@
                     <p class="subtitle">Masuk untuk mengelola stok dan transaksi toko Anda.</p>
                 </header>
 
+                <a class="btn google-login-button" href="{{ route('login.google') }}">
+                    <span aria-hidden="true">G</span>
+                    Masuk dengan Google
+                </a>
+
+                <div class="auth-divider"><span>atau masuk dengan email</span></div>
+
                 <form method="POST" action="{{ route('login.store') }}" class="stack">
                     @csrf
                     <div class="field">

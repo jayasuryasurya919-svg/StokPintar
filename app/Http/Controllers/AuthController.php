@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Laravel\Socialite\Facades\Socialite;
+use Throwable;
 
 class AuthController extends Controller
 {
@@ -33,29 +35,50 @@ class AuthController extends Controller
                 ->onlyInput('email');
         }
 
-        $user = Auth::user();
+        return $this->completeLogin($request, Auth::user());
+    }
 
-        if ($user->accessSchedules()->exists()) {
-            $today = now()->dayOfWeek;
-            $currentTime = now()->format('H:i:s');
-            
-            $hasAccess = $user->accessSchedules()
-                ->where('day_of_week', $today)
-                ->where('start_time', '<=', $currentTime)
-                ->where('end_time', '>=', $currentTime)
-                ->exists();
+    public function redirectToGoogle(): RedirectResponse
+    {
+        return Socialite::driver('google')
+            ->with(['prompt' => 'select_account'])
+            ->redirect();
+    }
 
-            if (!$hasAccess) {
-                Auth::logout();
-                return back()->withErrors(['email' => 'Anda tidak diizinkan login di luar jam kerja (shift) Anda.'])->onlyInput('email');
-            }
+    public function handleGoogleCallback(Request $request): RedirectResponse
+    {
+        try {
+            $googleUser = Socialite::driver('google')->stateless()->user();
+        } catch (Throwable) {
+            return redirect()
+                ->route('login')
+                ->withErrors(['email' => 'Login Google gagal. Coba ulangi atau masuk dengan email dan password.']);
         }
 
-        $request->session()->regenerate();
-        
-        \App\Support\ActivityLogger::log('login');
+        if (! $googleUser->getEmail()) {
+            return redirect()
+                ->route('login')
+                ->withErrors(['email' => 'Akun Google tidak mengirim alamat email. Gunakan akun Google lain.']);
+        }
 
-        return redirect()->to($this->redirectTargetFor($request, $request->user()));
+        $user = User::query()
+            ->where('google_id', $googleUser->getId())
+            ->orWhere('email', $googleUser->getEmail())
+            ->first();
+
+        if (! $user) {
+            $user = $this->createGoogleOwnerAccount($googleUser);
+        }
+
+        $user->forceFill([
+            'google_id' => $googleUser->getId(),
+            'google_avatar' => $googleUser->getAvatar(),
+            'email_verified_at' => $user->email_verified_at ?? now(),
+        ])->save();
+
+        Auth::login($user, true);
+
+        return $this->completeLogin($request, $user);
     }
 
     public function showRegister(): View
@@ -167,5 +190,92 @@ class AuthController extends Controller
         }
 
         return $intended;
+    }
+
+    private function completeLogin(Request $request, User $user): RedirectResponse
+    {
+        if ($user->accessSchedules()->exists()) {
+            $today = now()->dayOfWeek;
+            $currentTime = now()->format('H:i:s');
+
+            $hasAccess = $user->accessSchedules()
+                ->where('day_of_week', $today)
+                ->where('start_time', '<=', $currentTime)
+                ->where('end_time', '>=', $currentTime)
+                ->exists();
+
+            if (! $hasAccess) {
+                Auth::logout();
+
+                return redirect()
+                    ->route('login')
+                    ->withErrors(['email' => 'Anda tidak diizinkan login di luar jam kerja (shift) Anda.']);
+            }
+        }
+
+        $request->session()->regenerate();
+
+        \App\Support\ActivityLogger::log('login');
+
+        return redirect()->to($this->redirectTargetFor($request, $user));
+    }
+
+    private function createGoogleOwnerAccount($googleUser): User
+    {
+        $plan = SubscriptionPlan::query()->firstOrCreate(
+            ['code' => 'free'],
+            [
+                'name' => 'Free',
+                'price' => 0,
+                'max_stores' => 1,
+                'max_products' => 50,
+                'max_users' => 2,
+                'report_retention_days' => 7,
+                'features' => [
+                    'basic_pos',
+                    'stock_alerts',
+                    'pdf_export',
+                    'excel_export',
+                    'team_access',
+                    'fnb_recipes',
+                    'barcode_scanner',
+                    'activity_logs',
+                ],
+            ],
+        );
+
+        $name = $googleUser->getName() ?: Str::before($googleUser->getEmail(), '@');
+        $storeName = 'Toko '.$name;
+
+        $user = User::query()->create([
+            'name' => $name,
+            'email' => $googleUser->getEmail(),
+            'password' => Hash::make(Str::random(40)),
+            'role' => User::ROLE_OWNER,
+            'google_id' => $googleUser->getId(),
+            'google_avatar' => $googleUser->getAvatar(),
+            'email_verified_at' => now(),
+        ]);
+
+        $tenant = Tenant::query()->create([
+            'owner_id' => $user->id,
+            'subscription_plan_id' => $plan->id,
+            'name' => $storeName,
+            'slug' => Str::slug($storeName).'-'.Str::lower(Str::random(5)),
+            'status' => 'trial',
+            'trial_ends_at' => now()->addDays(14),
+            'subscription_ends_at' => null,
+        ]);
+
+        Store::withoutGlobalScopes()->create([
+            'tenant_id' => $tenant->id,
+            'name' => $storeName,
+            'code' => 'MAIN',
+            'is_default' => true,
+        ]);
+
+        $user->forceFill(['tenant_id' => $tenant->id])->save();
+
+        return $user;
     }
 }
