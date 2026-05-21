@@ -175,6 +175,57 @@ class SubscriptionManagementTest extends TestCase
             && $request['item_details'][0]['id'] === 'pro');
     }
 
+    public function test_auto_payment_provider_uses_midtrans_when_midtrans_key_exists(): void
+    {
+        config([
+            'services.payment.provider' => 'auto',
+            'services.payment.midtrans.server_key' => 'midtrans-server-key',
+            'services.payment.xendit.secret_key' => null,
+            'services.payment.midtrans.is_production' => false,
+        ]);
+
+        Http::fake([
+            'app.sandbox.midtrans.com/*' => Http::response([
+                'token' => 'snap-token-auto',
+                'redirect_url' => 'https://app.sandbox.midtrans.com/snap/v2/vtweb/snap-token-auto',
+            ], 201),
+        ]);
+
+        $free = SubscriptionPlan::query()->create([
+            'code' => 'free',
+            'name' => 'Free',
+            'price' => 0,
+            'max_stores' => 1,
+            'max_products' => 50,
+            'max_users' => 2,
+            'report_retention_days' => 7,
+            'features' => ['basic_pos'],
+        ]);
+
+        $starter = SubscriptionPlan::query()->create([
+            'code' => 'starter',
+            'name' => 'Starter',
+            'price' => 49000,
+            'max_stores' => 1,
+            'max_products' => 500,
+            'max_users' => 5,
+            'report_retention_days' => 30,
+            'features' => ['basic_pos'],
+        ]);
+
+        [$owner] = $this->ownerWithTenantAndPlan($free);
+
+        $this->actingAs($owner)->post(route('subscription.plan.update'), [
+            'subscription_plan_id' => $starter->id,
+        ])->assertRedirect('https://app.sandbox.midtrans.com/snap/v2/vtweb/snap-token-auto');
+
+        $this->assertDatabaseHas('subscriptions', [
+            'subscription_plan_id' => $starter->id,
+            'status' => 'pending',
+            'provider' => 'midtrans',
+        ]);
+    }
+
     public function test_midtrans_notification_activates_paid_subscription(): void
     {
         config(['services.payment.midtrans.server_key' => 'midtrans-server-key']);

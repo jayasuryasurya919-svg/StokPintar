@@ -42,7 +42,7 @@ return [
     ],
 
     'payment' => [
-        'provider' => env('PAYMENT_PROVIDER', 'manual'),
+        'provider' => env('PAYMENT_PROVIDER', 'auto'),
 
         'midtrans' => [
             'server_key' => env('MIDTRANS_SERVER_KEY'),

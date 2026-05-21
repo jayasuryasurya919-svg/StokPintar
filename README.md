@@ -60,17 +60,18 @@ php artisan migrate:fresh --seed
 - Isi SMTP production agar undangan tim dan reset password benar-benar terkirim.
 - Jalankan queue worker untuk email dan pekerjaan background.
 - Isi storage/public disk sesuai hosting dan jalankan `php artisan storage:link`.
-- Pilih `PAYMENT_PROVIDER=manual`, `midtrans`, atau `xendit` sesuai integrasi bisnis.
-- Isi key payment gateway hanya di `.env` production, jangan commit key rahasia.
+- Biarkan `PAYMENT_PROVIDER=auto` agar aplikasi otomatis memakai gateway yang key-nya tersedia.
+- Isi key payment gateway hanya di `.env` server production, jangan commit key rahasia.
 - Pakai HTTPS agar akses kamera barcode browser bisa aktif di production.
 
 ## Payment Gateway
 
-Konfigurasi payment disiapkan di `.env.example` dan `config/services.php`.
+Konfigurasi payment disiapkan oleh pemilik aplikasi/server di `.env`. Tenant atau owner toko tidak perlu menyentuh `.env`; mereka cukup klik tombol `Bayar` di halaman paket.
 
-- `PAYMENT_PROVIDER=manual`: pembayaran langganan ditangani manual/admin.
-- `PAYMENT_PROVIDER=midtrans`: isi `MIDTRANS_SERVER_KEY`, `MIDTRANS_CLIENT_KEY`, dan `MIDTRANS_IS_PRODUCTION`.
-- `PAYMENT_PROVIDER=xendit`: isi `XENDIT_SECRET_KEY` dan `XENDIT_CALLBACK_TOKEN`.
+- `PAYMENT_PROVIDER=auto`: otomatis pakai Midtrans jika key Midtrans ada, kalau tidak pakai Xendit jika key Xendit ada.
+- `PAYMENT_PROVIDER=midtrans`: paksa hanya Midtrans.
+- `PAYMENT_PROVIDER=xendit`: paksa hanya Xendit.
+- `PAYMENT_PROVIDER=manual`: nonaktifkan upgrade berbayar otomatis; paket berbayar harus diurus admin platform.
 
 Saat memakai Midtrans, isi Payment Notification URL di dashboard Midtrans:
 

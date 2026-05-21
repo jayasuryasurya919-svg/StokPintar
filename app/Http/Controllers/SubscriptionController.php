@@ -51,7 +51,7 @@ class SubscriptionController extends Controller
 
         if ($plan->price > 0) {
             return back()->withErrors([
-                'subscription_plan_id' => 'Payment gateway belum aktif. Pilih Midtrans/Xendit di .env sebelum upgrade ke paket berbayar.',
+                'subscription_plan_id' => 'Payment gateway belum aktif. Hubungi admin platform untuk mengaktifkan pembayaran paket berbayar.',
             ]);
         }
 
@@ -229,15 +229,19 @@ class SubscriptionController extends Controller
 
     private function shouldUseMidtrans(SubscriptionPlan $plan): bool
     {
+        $provider = config('services.payment.provider', 'auto');
+
         return $plan->price > 0
-            && config('services.payment.provider') === 'midtrans'
+            && in_array($provider, ['auto', 'midtrans'], true)
             && filled(config('services.payment.midtrans.server_key'));
     }
 
     private function shouldUseXendit(SubscriptionPlan $plan): bool
     {
+        $provider = config('services.payment.provider', 'auto');
+
         return $plan->price > 0
-            && config('services.payment.provider') === 'xendit'
+            && in_array($provider, ['auto', 'xendit'], true)
             && filled(config('services.payment.xendit.secret_key'));
     }
 
