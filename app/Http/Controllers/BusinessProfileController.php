@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Store;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
@@ -48,20 +47,9 @@ class BusinessProfileController extends Controller
             ],
             'store_phone' => ['nullable', 'string', 'max:40'],
             'store_address' => ['nullable', 'string', 'max:500'],
-            'logo' => ['nullable', 'image', 'max:2048'],
         ]);
 
-        $tenantPayload = ['name' => $data['tenant_name']];
-
-        if ($request->hasFile('logo')) {
-            if ($tenant->logo_path) {
-                Storage::disk('public')->delete($tenant->logo_path);
-            }
-
-            $tenantPayload['logo_path'] = $request->file('logo')->store('tenant-logos', 'public');
-        }
-
-        $tenant->update($tenantPayload);
+        $tenant->update(['name' => $data['tenant_name']]);
 
         if (! $store) {
             Store::query()->create([

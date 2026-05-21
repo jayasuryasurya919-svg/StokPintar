@@ -13,7 +13,6 @@ class Tenant extends Model
         'subscription_plan_id',
         'name',
         'slug',
-        'logo_path',
         'status',
         'trial_ends_at',
         'subscription_ends_at',

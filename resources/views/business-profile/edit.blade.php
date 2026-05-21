@@ -12,7 +12,7 @@
 
     <div class="page-stack">
         <section class="card">
-            <form method="POST" action="{{ route('business-profile.update') }}" enctype="multipart/form-data" class="stack">
+            <form method="POST" action="{{ route('business-profile.update') }}" class="stack">
                 @csrf
                 <div class="form-grid">
                     <div class="field">
@@ -36,14 +36,6 @@
                         <textarea id="store_address" name="store_address" rows="3">{{ old('store_address', $defaultStore?->address) }}</textarea>
                     </div>
                 </div>
-
-                <details class="card compact" style="margin:0;">
-                    <summary class="btn small">Logo Toko</summary>
-                    <div class="field" style="margin-top:12px;">
-                        <label for="logo">Upload Logo</label>
-                        <input id="logo" name="logo" type="file" accept="image/*">
-                    </div>
-                </details>
 
                 <div class="form-actions">
                     <button class="btn primary" type="submit"><span class="material-symbols-outlined">save</span> Simpan</button>
