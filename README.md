@@ -72,7 +72,13 @@ Konfigurasi payment disiapkan di `.env.example` dan `config/services.php`.
 - `PAYMENT_PROVIDER=midtrans`: isi `MIDTRANS_SERVER_KEY`, `MIDTRANS_CLIENT_KEY`, dan `MIDTRANS_IS_PRODUCTION`.
 - `PAYMENT_PROVIDER=xendit`: isi `XENDIT_SECRET_KEY` dan `XENDIT_CALLBACK_TOKEN`.
 
-Integrasi charge otomatis dapat ditambahkan di atas konfigurasi ini tanpa menyimpan credential di kode.
+Saat memakai Midtrans, isi Payment Notification URL di dashboard Midtrans:
+
+```txt
+https://domain-anda.example/payments/midtrans/notification
+```
+
+Di lokal, gunakan tunnel seperti Ngrok agar Midtrans bisa mengirim webhook ke komputer pengembangan.
 
 ## Barcode Scanner
 

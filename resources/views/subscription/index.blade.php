@@ -53,6 +53,20 @@
             </details>
         </section>
 
+        @if($latestSubscription?->status === 'pending' && ($latestSubscription->metadata['redirect_url'] ?? null))
+            <section class="card compact">
+                <div class="section-title">
+                    <div>
+                        <h2>Pembayaran Menunggu</h2>
+                        <p class="muted" style="margin:4px 0 0;">Selesaikan pembayaran paket {{ $latestSubscription->plan?->name }} melalui Midtrans.</p>
+                    </div>
+                    <a class="btn primary" href="{{ $latestSubscription->metadata['redirect_url'] }}">
+                        Lanjutkan Pembayaran
+                    </a>
+                </div>
+            </section>
+        @endif
+
         <section class="card flush">
             <div class="panel-header">
                 <h2>Pilih Paket</h2>

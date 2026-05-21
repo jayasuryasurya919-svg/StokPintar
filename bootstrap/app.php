@@ -19,6 +19,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'permission' => EnsurePermission::class,
             'role' => EnsureRole::class,
         ]);
+
+        $middleware->validateCsrfTokens(except: [
+            'payments/midtrans/notification',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
