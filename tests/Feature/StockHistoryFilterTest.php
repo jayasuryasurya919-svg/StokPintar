@@ -39,6 +39,22 @@ class StockHistoryFilterTest extends TestCase
             ->assertSessionHasErrors('product_id');
     }
 
+    public function test_stock_history_summary_uses_the_same_filters_as_the_table(): void
+    {
+        [$owner, , $product] = $this->stockHistoryContext();
+
+        $this->actingAs($owner)
+            ->get(route('stock-history.index', [
+                'product_id' => $product->id,
+                'type' => StockMutation::TYPE_SALE,
+            ]))
+            ->assertOk()
+            ->assertSee('Total Catatan')
+            ->assertSee('0')
+            ->assertSee('+0')
+            ->assertSee('-0');
+    }
+
     /**
      * @return array{0: User, 1: Store, 2: Product}
      */

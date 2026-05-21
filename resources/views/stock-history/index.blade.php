@@ -15,7 +15,7 @@
 <section class="grid-3" style="grid-template-columns:repeat(3,1fr)">
     <div class="card metric-card">
         <p class="metric-label">Total Catatan</p>
-        <p class="metric-value">{{ $mutations->total() }}</p>
+        <p class="metric-value">{{ $totalMutations }}</p>
         <p class="metric-note">Semua mutasi stok</p>
         <span class="material-symbols-outlined">history</span>
     </div>

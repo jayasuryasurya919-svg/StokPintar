@@ -48,14 +48,18 @@ class StockHistoryController extends Controller
             $query->whereDate('created_at', '<=', $filters['date_to']);
         }
 
-        $mutations = $query->paginate(20)->withQueryString();
+        $summaryQuery = clone $query;
 
-        $totalIn  = (clone $query->getQuery())->where('quantity', '>', 0)->sum('quantity');
-        $totalOut = abs((clone $query->getQuery())->where('quantity', '<', 0)->sum('quantity'));
+        $totalMutations = (clone $summaryQuery)->count();
+        $totalIn = (clone $summaryQuery)->where('quantity', '>', 0)->sum('quantity');
+        $totalOut = abs((clone $summaryQuery)->where('quantity', '<', 0)->sum('quantity'));
+
+        $mutations = $query->paginate(20)->withQueryString();
 
         return view('stock-history.index', [
             'mutations' => $mutations,
             'products'  => Product::query()->orderBy('name')->get(['id', 'name', 'sku']),
+            'totalMutations' => $totalMutations,
             'totalIn'   => $totalIn,
             'totalOut'  => $totalOut,
             'types'     => [
