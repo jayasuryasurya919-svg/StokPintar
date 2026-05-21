@@ -78,7 +78,13 @@ Saat memakai Midtrans, isi Payment Notification URL di dashboard Midtrans:
 https://domain-anda.example/payments/midtrans/notification
 ```
 
-Di lokal, gunakan tunnel seperti Ngrok agar Midtrans bisa mengirim webhook ke komputer pengembangan.
+Saat memakai Xendit, isi Invoice Callback URL di dashboard Xendit:
+
+```txt
+https://domain-anda.example/payments/xendit/callback
+```
+
+Di lokal, gunakan tunnel seperti Ngrok agar Midtrans/Xendit bisa mengirim webhook ke komputer pengembangan.
 
 ## Barcode Scanner
 

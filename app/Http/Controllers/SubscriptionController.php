@@ -45,6 +45,10 @@ class SubscriptionController extends Controller
             return $this->createMidtransPayment($request, $tenant, $plan);
         }
 
+        if ($this->shouldUseXendit($plan)) {
+            return $this->createXenditPayment($request, $tenant, $plan);
+        }
+
         $this->activateSubscription($tenant, $plan, 'manual', null, [
             'changed_by' => $request->user()->id,
             'source' => 'owner-panel',
@@ -116,6 +120,62 @@ class SubscriptionController extends Controller
         return response()->json(['status' => 'ok']);
     }
 
+    public function xenditCallback(Request $request): JsonResponse
+    {
+        $callbackToken = (string) config('services.payment.xendit.callback_token');
+        abort_if($callbackToken === '', 503, 'Xendit is not configured.');
+        abort_unless(hash_equals($callbackToken, (string) $request->header('x-callback-token')), 403, 'Invalid Xendit callback token.');
+
+        $data = $request->validate([
+            'external_id' => ['required', 'string'],
+            'status' => ['required', 'string'],
+            'id' => ['nullable', 'string'],
+            'payment_method' => ['nullable', 'string'],
+            'paid_at' => ['nullable', 'string'],
+        ]);
+
+        $subscription = Subscription::withoutGlobalScopes()
+            ->where('provider', 'xendit')
+            ->where('provider_reference', $data['external_id'])
+            ->first();
+
+        if (! $subscription) {
+            return response()->json(['status' => 'ignored']);
+        }
+
+        $status = strtoupper($data['status']);
+
+        if (in_array($status, ['PAID', 'SETTLED'], true)) {
+            $tenant = Tenant::withoutGlobalScopes()->find($subscription->tenant_id);
+            $plan = SubscriptionPlan::query()->find($subscription->subscription_plan_id);
+
+            if ($tenant && $plan) {
+                $this->activateSubscription($tenant, $plan, 'xendit', $data['external_id'], array_merge($subscription->metadata ?? [], [
+                    'invoice_id' => $data['id'] ?? null,
+                    'payment_method' => $data['payment_method'] ?? null,
+                    'paid_at' => $data['paid_at'] ?? null,
+                    'paid_via_webhook' => true,
+                ]));
+            }
+        } elseif (in_array($status, ['EXPIRED', 'FAILED'], true)) {
+            $subscription->update([
+                'status' => 'failed',
+                'metadata' => array_merge($subscription->metadata ?? [], [
+                    'xendit_status' => $status,
+                ]),
+            ]);
+        } else {
+            $subscription->update([
+                'status' => 'pending',
+                'metadata' => array_merge($subscription->metadata ?? [], [
+                    'xendit_status' => $status,
+                ]),
+            ]);
+        }
+
+        return response()->json(['status' => 'ok']);
+    }
+
     public function updateTenant(Request $request): RedirectResponse
     {
         $tenant = $request->user()->tenant;
@@ -166,6 +226,13 @@ class SubscriptionController extends Controller
         return $plan->price > 0
             && config('services.payment.provider') === 'midtrans'
             && filled(config('services.payment.midtrans.server_key'));
+    }
+
+    private function shouldUseXendit(SubscriptionPlan $plan): bool
+    {
+        return $plan->price > 0
+            && config('services.payment.provider') === 'xendit'
+            && filled(config('services.payment.xendit.secret_key'));
     }
 
     private function createMidtransPayment(Request $request, Tenant $tenant, SubscriptionPlan $plan): RedirectResponse
@@ -238,5 +305,66 @@ class SubscriptionController extends Controller
         return config('services.payment.midtrans.is_production')
             ? 'https://app.midtrans.com/snap/v1/transactions'
             : 'https://app.sandbox.midtrans.com/snap/v1/transactions';
+    }
+
+    private function createXenditPayment(Request $request, Tenant $tenant, SubscriptionPlan $plan): RedirectResponse
+    {
+        $externalId = 'SP-'.$tenant->id.'-'.$plan->id.'-'.now()->format('YmdHis');
+        $amount = (int) $plan->price;
+
+        $subscription = Subscription::withoutGlobalScopes()->create([
+            'tenant_id' => $tenant->id,
+            'subscription_plan_id' => $plan->id,
+            'status' => 'pending',
+            'provider' => 'xendit',
+            'provider_reference' => $externalId,
+            'starts_at' => null,
+            'ends_at' => null,
+            'metadata' => [
+                'changed_by' => $request->user()->id,
+                'source' => 'owner-panel',
+                'amount' => $amount,
+                'external_id' => $externalId,
+            ],
+        ]);
+
+        $response = Http::withBasicAuth((string) config('services.payment.xendit.secret_key'), '')
+            ->acceptJson()
+            ->post('https://api.xendit.co/v2/invoices', [
+                'external_id' => $externalId,
+                'amount' => $amount,
+                'currency' => 'IDR',
+                'payer_email' => $request->user()->email,
+                'description' => 'Langganan StokPintar '.$plan->name,
+                'success_redirect_url' => route('subscription.index'),
+                'failure_redirect_url' => route('subscription.index'),
+                'callback_url' => route('payments.xendit.callback'),
+                'items' => [[
+                    'name' => 'Langganan StokPintar '.$plan->name,
+                    'quantity' => 1,
+                    'price' => $amount,
+                    'category' => 'Subscription',
+                ]],
+            ]);
+
+        if ($response->failed() || ! $response->json('invoice_url')) {
+            $subscription->update([
+                'status' => 'failed',
+                'metadata' => array_merge($subscription->metadata ?? [], [
+                    'xendit_error' => $response->json() ?: $response->body(),
+                ]),
+            ]);
+
+            return back()->withErrors(['subscription_plan_id' => 'Payment gateway belum bisa membuat invoice Xendit. Cek konfigurasi Xendit.']);
+        }
+
+        $subscription->update([
+            'metadata' => array_merge($subscription->metadata ?? [], [
+                'invoice_id' => $response->json('id'),
+                'redirect_url' => $response->json('invoice_url'),
+            ]),
+        ]);
+
+        return redirect()->away($response->json('invoice_url'));
     }
 }

@@ -476,7 +476,7 @@
                 }
 
                 const script = document.createElement('script');
-                script.src = 'https://unpkg.com/@zxing/library@0.21.3/umd/index.min.js';
+                script.src = '{{ asset('vendor/zxing/index.min.js') }}';
                 script.async = true;
                 script.dataset.zxingFallback = 'true';
                 script.onload = resolve;

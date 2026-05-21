@@ -58,7 +58,7 @@
                 <div class="section-title">
                     <div>
                         <h2>Pembayaran Menunggu</h2>
-                        <p class="muted" style="margin:4px 0 0;">Selesaikan pembayaran paket {{ $latestSubscription->plan?->name }} melalui Midtrans.</p>
+                        <p class="muted" style="margin:4px 0 0;">Selesaikan pembayaran paket {{ $latestSubscription->plan?->name }} melalui {{ strtoupper($latestSubscription->provider) }}.</p>
                     </div>
                     <a class="btn primary" href="{{ $latestSubscription->metadata['redirect_url'] }}">
                         Lanjutkan Pembayaran

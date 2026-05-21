@@ -47,6 +47,7 @@ Route::view('/demo', 'demo')->name('demo');
 Route::get('/terms', [LegalPageController::class, 'terms'])->name('legal.terms');
 Route::get('/privacy', [LegalPageController::class, 'privacy'])->name('legal.privacy');
 Route::post('/payments/midtrans/notification', [SubscriptionController::class, 'midtransNotification'])->name('payments.midtrans.notification');
+Route::post('/payments/xendit/callback', [SubscriptionController::class, 'xenditCallback'])->name('payments.xendit.callback');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');

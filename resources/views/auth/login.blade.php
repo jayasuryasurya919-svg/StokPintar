@@ -7,7 +7,7 @@
         <section class="auth-visual">
             <img
                 alt="Modern Retail Interior"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJMAQcs-iZ_k9obZV7vpBvUVCvPIDcRejsCbbxKzZlT6RG_PcAVZHhmRgE3HcgyVIke6Cm3OPu3Ly205nBg_FQVsP-AcU7Px2oXLX7T-K612DBopvtbNHXg2BixalYYNPvQ8mGqURLBFPsLNxlSwiYNc0Bxbf_cnJkLfGhuHxHhF-ZYi7ffsCWyjcPL41p9yYb7PyeV9uc7zBIANEN7cujrhtUr8DBr5KXan1lyFzY_mlNAxgRB0VAakn9uHvRtYOn4NzPEGPLKpJu"
+                src="{{ asset('images/auth-retail.svg') }}"
             >
             <div class="auth-copy">
                 <div class="auth-brand-line">

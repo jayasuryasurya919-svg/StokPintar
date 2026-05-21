@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-labelledby="title desc">
+  <title id="title">Rak toko modern</title>
+  <desc id="desc">Ilustrasi interior toko dengan rak produk dan meja kasir bernuansa hijau.</desc>
+  <defs>
+    <linearGradient id="wall" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0a4a3b"/>
+      <stop offset="0.62" stop-color="#063326"/>
+      <stop offset="1" stop-color="#001e15"/>
+    </linearGradient>
+    <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#153f32"/>
+      <stop offset="1" stop-color="#061f18"/>
+    </linearGradient>
+    <linearGradient id="wood" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#d5c092"/>
+      <stop offset="1" stop-color="#8e7a50"/>
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="22" stdDeviation="18" flood-color="#001e15" flood-opacity=".32"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="900" fill="url(#wall)"/>
+  <path d="M0 675h1200v225H0z" fill="url(#floor)"/>
+  <path d="M80 650h1010M120 710h960M180 770h830" stroke="#2a5b4b" stroke-opacity=".45" stroke-width="2"/>
+  <g opacity=".3">
+    <circle cx="1060" cy="90" r="190" fill="#b0f0d6"/>
+    <circle cx="1050" cy="90" r="120" fill="#79d8b6"/>
+  </g>
+  <g filter="url(#softShadow)">
+    <g transform="translate(120 160)">
+      <rect x="0" y="0" width="220" height="520" rx="10" fill="url(#wood)"/>
+      <rect x="22" y="30" width="176" height="440" rx="6" fill="#14382d"/>
+      <path d="M22 130h176M22 230h176M22 330h176" stroke="#c5b07e" stroke-width="12"/>
+      <path d="M50 90h42M110 90h42M52 190h38M112 190h58M52 290h58M126 290h42M56 390h42M118 390h54" stroke="#b0f0d6" stroke-width="24" stroke-linecap="round"/>
+      <rect x="0" y="490" width="220" height="80" rx="8" fill="#b79c67"/>
+    </g>
+    <g transform="translate(390 105)">
+      <rect x="0" y="0" width="260" height="575" rx="12" fill="url(#wood)"/>
+      <rect x="26" y="34" width="208" height="486" rx="6" fill="#12352a"/>
+      <path d="M26 145h208M26 270h208M26 395h208" stroke="#cab783" stroke-width="14"/>
+      <path d="M60 92h52M134 92h58M62 215h76M160 215h44M60 340h54M140 340h76M62 462h52M138 462h74" stroke="#9debc8" stroke-width="28" stroke-linecap="round"/>
+      <rect x="0" y="532" width="260" height="95" rx="9" fill="#af9461"/>
+    </g>
+    <g transform="translate(725 235)">
+      <rect x="0" y="0" width="330" height="355" rx="12" fill="#0f3027"/>
+      <rect x="25" y="30" width="280" height="118" rx="8" fill="#173f33"/>
+      <rect x="25" y="178" width="280" height="118" rx="8" fill="#173f33"/>
+      <path d="M55 96h82M160 96h92M58 244h72M154 244h104" stroke="#b0f0d6" stroke-width="28" stroke-linecap="round"/>
+    </g>
+    <g transform="translate(745 620)">
+      <rect x="0" y="0" width="340" height="120" rx="18" fill="#b99e6c"/>
+      <rect x="32" y="32" width="95" height="56" rx="10" fill="#19392f"/>
+      <rect x="164" y="28" width="132" height="64" rx="10" fill="#e9ddbd"/>
+    </g>
+  </g>
+  <rect width="1200" height="900" fill="#003527" opacity=".2"/>
+</svg>
